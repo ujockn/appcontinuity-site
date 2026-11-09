@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Articles — AppContinuity</title>
+  <title>RevenueCat and Capacitor articles — AppContinuity</title>
   <meta name="description" content="Notes from AppContinuity on RevenueCat, Capacitor, Supabase Auth, and keeping paid access the same on web, iPhone and Android." />
   <link rel="canonical" href="https://appcontinuity.com/articles/" />
   <meta name="theme-color" content="#05070d" />
@@ -12,13 +12,13 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="AppContinuity" />
   <meta property="og:url" content="https://appcontinuity.com/articles/" />
-  <meta property="og:title" content="Articles — AppContinuity" />
+  <meta property="og:title" content="RevenueCat and Capacitor articles — AppContinuity" />
   <meta property="og:description" content="Notes from AppContinuity on RevenueCat, Capacitor, Supabase Auth, and keeping paid access the same on web, iPhone and Android." />
   <meta property="og:image" content="https://appcontinuity.com/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Articles — AppContinuity" />
+  <meta name="twitter:title" content="RevenueCat and Capacitor articles — AppContinuity" />
   <meta name="twitter:description" content="Notes on RevenueCat, Capacitor, Supabase Auth, and cross-platform entitlements." />
   <meta name="twitter:image" content="https://appcontinuity.com/og.png" />
 
@@ -51,11 +51,16 @@
     <div class="article">
       <p class="eyebrow mono">Writing</p>
       <h1>Articles</h1>
-      <p class="lede">Notes on wiring RevenueCat into React/Capacitor apps so Stripe, the App Store and Play unlock the same access.</p>
+      <div class="prose">
+        <p>These notes are about one stack: a React app wrapped with Capacitor, people signing in with Supabase Auth, subscriptions already selling on the web through Stripe, and in-app purchases going through RevenueCat so iPhone and Android unlock the same access.</p>
+        <p>Paid access drifts when each platform answers “is this person paid?” on its own. A customer subscribes on the web and meets a paywall in the iPhone app. An Android subscription lapses, but the web app still unlocks everything. Refunds, restores and account switches each update a different record. That is usually not a missing button on the paywall. It is a Supabase user, a Stripe customer, and a RevenueCat app user ID — sometimes still anonymous — that have not been attached to one entitlement.</p>
+        <p>What we write here is the work between those systems: identifying a Supabase user in RevenueCat before you trust entitlements; attaching a Stripe web subscription so it unlocks the Capacitor app; keeping access as a server decision instead of a premium flag on the device; and handling purchase, renewal, cancellation, refund, restore and transfer on one path that is safe to retry.</p>
+        <p>The first article walks through the version founders hit most often: a Stripe subscriber who opens the Capacitor iPhone app and sees a paywall. We stay on this stack on purpose. Native Swift or Kotlin, Flutter and React Native apps are outside what we cover, and so are rebuilds or a move to new accounts.</p>
+      </div>
       <div class="article-list">
         <a class="card" href="/articles/why-a-stripe-subscriber-hits-a-paywall/">
           <p class="card__meta">9 November 2026</p>
-          <h3>Why a Stripe subscriber hits a paywall in your Capacitor iPhone app</h3>
+          <h2>Why a Stripe subscriber hits a paywall in your Capacitor iPhone app</h2>
           <p>Someone pays on the web, opens the iPhone app, and meets a paywall. How Stripe, RevenueCat, and Supabase Auth get out of sync — and what to run in sandbox before you trust it.</p>
         </a>
       </div>
