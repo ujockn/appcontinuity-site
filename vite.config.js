@@ -14,6 +14,8 @@ export default defineConfig({
         main: resolve(dir, 'index.html'),
         articles: resolve(dir, 'articles/index.html'),
         paywall: resolve(dir, 'articles/why-a-stripe-subscriber-hits-a-paywall/index.html'),
+        about: resolve(dir, 'about/index.html'),
+        privacy: resolve(dir, 'privacy/index.html'),
       },
     },
   },
