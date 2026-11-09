@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Why a Stripe subscriber hits a paywall in your Capacitor iPhone app — AppContinuity</title>
+  <meta name="description" content="Someone pays on the web, opens the iPhone app, and meets a paywall. How Stripe, RevenueCat, and Supabase Auth get out of sync in a Capacitor app." />
+  <link rel="canonical" href="https://appcontinuity.com/articles/why-a-stripe-subscriber-hits-a-paywall/" />
+  <meta name="theme-color" content="#05070d" />
+  <meta name="color-scheme" content="dark" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="AppContinuity" />
+  <meta property="og:url" content="https://appcontinuity.com/articles/why-a-stripe-subscriber-hits-a-paywall/" />
+  <meta property="og:title" content="Why a Stripe subscriber hits a paywall in your Capacitor iPhone app" />
+  <meta property="og:description" content="Someone pays on the web, opens the iPhone app, and meets a paywall. How Stripe, RevenueCat, and Supabase Auth get out of sync in a Capacitor app." />
+  <meta property="og:image" content="https://appcontinuity.com/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-11-09" />
+  <meta property="article:author" content="AppContinuity" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Why a Stripe subscriber hits a paywall in your Capacitor iPhone app" />
+  <meta name="twitter:description" content="Someone pays on the web, opens the iPhone app, and meets a paywall. How Stripe, RevenueCat, and Supabase Auth get out of sync in a Capacitor app." />
+  <meta name="twitter:image" content="https://appcontinuity.com/og.png" />
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Why a Stripe subscriber hits a paywall in your Capacitor iPhone app",
+    "description": "Someone pays on the web, opens the iPhone app, and meets a paywall. How Stripe, RevenueCat, and Supabase Auth get out of sync in a Capacitor app.",
+    "datePublished": "2026-11-09",
+    "dateModified": "2026-11-09",
+    "author": {
+      "@type": "Organization",
+      "name": "AppContinuity",
+      "url": "https://appcontinuity.com/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AppContinuity",
+      "url": "https://appcontinuity.com/"
+    },
+    "mainEntityOfPage": "https://appcontinuity.com/articles/why-a-stripe-subscriber-hits-a-paywall/",
+    "url": "https://appcontinuity.com/articles/why-a-stripe-subscriber-hits-a-paywall/",
+    "image": "https://appcontinuity.com/og.png"
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top">
+    <a class="brand" href="/" aria-label="AppContinuity, home">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".45"/><circle cx="16" cy="16" r="4.2" fill="#7cf2d0"/><circle cx="16" cy="5" r="2" fill="currentColor"/><circle cx="25.5" cy="21.5" r="2" fill="currentColor"/><circle cx="6.5" cy="21.5" r="2" fill="currentColor"/></svg>
+      <span>AppContinuity</span>
+    </a>
+    <nav class="nav" aria-label="Site">
+      <a href="/#problem">Problem</a>
+      <a href="/#scope">Scope</a>
+      <a href="/#process">Process</a>
+      <a href="/#fit">Fit</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/articles/" aria-current="page">Articles</a>
+      <a href="/#contact-us">Contact</a>
+    </nav>
+    <div class="top__actions">
+      <a class="btn btn--small" href="/#contact">Book a fit check</a>
+    </div>
+  </header>
+  <main id="main" class="article-main">
+    <article class="article">
+      <p class="eyebrow mono"><a href="/articles/">Articles</a></p>
+      <h1>Why a Stripe subscriber hits a paywall in your Capacitor iPhone app</h1>
+      <p class="byline">By AppContinuity · 9 November 2026</p>
+      <div class="prose">
+        <p>The most common continuity failure we see in this stack is also the one founders describe first: someone pays on the web, opens the iPhone app, and meets a paywall. The web app is sure they are subscribed. The store, RevenueCat, and your Supabase session each have a different idea of who “they” are.</p>
+        <p>This piece is about that mismatch in a React app wrapped with Capacitor, signed in through Supabase Auth, and billed on the web through Stripe — and what we learned wiring the same entitlement through RevenueCat, including a sandbox purchase run end to end on an iPad.</p>
+
+        <h2>Three answers to “is this person paid?”</h2>
+        <p>On the web, paid access usually means “this Supabase user has an active Stripe subscription.” In the Capacitor app, paid access often starts as “RevenueCat says this <code>appUserID</code> has an active entitlement,” and that ID may have been created before anyone signed in.</p>
+        <p>RevenueCat will happily create an anonymous app user the first time the SDK is configured without an ID. Purchases made in that anonymous state belong to that anonymous ID. Your Supabase user is a different identifier. Stripe’s customer is a third. Until those three are attached to one RevenueCat customer, each platform is answering the question on its own.</p>
+        <p>That is why a perfectly valid Stripe subscription does not unlock an iPhone paywall by itself. The App Store never saw that payment, and RevenueCat has not been told that the signed-in Supabase user is the same person who paid on the web.</p>
+
+        <h2>Identify the Supabase user before you trust entitlements</h2>
+        <p>RevenueCat’s Capacitor SDK is configured once, early in the app lifecycle, with the public SDK key. If you do not yet have a signed-in user, you configure without an app user ID. After Supabase Auth has a session, you log that user’s ID in. The method names below are from RevenueCat’s identifying-customers guide (<a href="https://www.revenuecat.com/docs/customers/identifying-customers">https://www.revenuecat.com/docs/customers/identifying-customers</a>):</p>
+        <pre><code>import { Purchases } from '@revenuecat/purchases-capacitor';
+
+await Purchases.configure({ apiKey: publicSdkKey });
+
+const { data: { user } } = await supabase.auth.getUser();
+if (user) {
+  await Purchases.logIn({ appUserID: user.id });
+}</code></pre>
+        <p>Use the stable Supabase user id, not an email address. Emails change; the user id does not. Do not hard-code an app user ID into <code>configure</code> — RevenueCat’s docs warn that every install then looks like the same customer and shares purchases.</p>
+        <p>Two details that bite Capacitor apps in particular:</p>
+        <ol>
+          <li>Configure once. Calling <code>configure</code> again when the user signs in is the wrong move. Switch identities with <code>logIn</code>. RevenueCat’s own guidance is that you do not need to <code>logOut</code> first when moving from one custom ID to another; call <code>logIn</code> with the new id.</li>
+          <li>Log out of RevenueCat when the Supabase session ends. If you only sign out of Supabase and leave the SDK identified, the next person on the phone can inherit the previous entitlement. Account switching is one of the sandbox cases we run for exactly this reason.</li>
+        </ol>
+        <p>When an anonymous ID is later logged in to a custom ID, webhook payloads can show both: <code>original_app_user_id</code> as the anonymous id and <code>app_user_id</code> as the custom id. If your backend keys entitlements only on one of those fields and ignores the other, restores and transfers look like missing subscribers.</p>
+
+        <h2>Stripe on the web is not an App Store purchase</h2>
+        <p>Connecting Stripe web subscriptions to RevenueCat is a separate step from wiring StoreKit or Play Billing. A checkout on your website does not create an App Store transaction. RevenueCat can still grant the same entitlement to the same app user — but only after the Stripe subscription is attached to that user in RevenueCat.</p>
+        <p>Until that attachment exists, this sequence is normal and confusing:</p>
+        <ul class="list list--check">
+          <li>The customer pays in your web app, signed in with Supabase.</li>
+          <li>Stripe shows an active subscription for that customer.</li>
+          <li>The Capacitor app opens, perhaps still on an anonymous RevenueCat ID, and <code>CustomerInfo</code> has no active entitlement.</li>
+          <li>Your paywall appears. Support hears about it before you do.</li>
+        </ul>
+        <p>The fix is not “also check Stripe from the iPhone app.” It is: map the Supabase user to a RevenueCat customer, attach the Stripe subscription to that customer, and let one entitlement decide access on web, iPhone, and Android. That is the entitlement-sync deliverable, not an extra SDK call on the paywall screen.</p>
+
+        <h2>Do not let the client award access</h2>
+        <p>Early in our own build we used a sandbox proof whose whole point was that access is decided on the server. The client could send a local “premium” flag along with a request. The server ignored it. Switching identities cleared the previous identity’s premium note immediately. That fixture did not talk to RevenueCat, Apple, Google, or a hosted Supabase project — it was there to make the rule visible: a flag stored on the device cannot be the source of truth.</p>
+        <p>The same rule applies once the stores are real. Cached <code>CustomerInfo</code> is useful for showing the right UI quickly. It is not a substitute for a server decision keyed to the signed-in Supabase user. If the app can flip a boolean and unlock features, account switching and refunds will drift, and you will not be able to say which dashboard is right.</p>
+        <p>We later ran a sandbox purchase end to end on an iPad, through the real store sandbox and RevenueCat, so the purchase, the identified user, and the entitlement could be checked together rather than simulated.</p>
+
+        <h2>Refunds, transfers, and the webhook you actually handle</h2>
+        <p>Purchase is only the first event. Refunds, billing-portal cancellations, store transfers, and account switches each update a different record if you treat them as optional cleanup.</p>
+        <p>A webhook that only handles the initial purchase will leave a web cancellation or an App Store refund sitting in Stripe or App Store Connect while your Supabase user remains marked premium. A webhook that updates “the latest event’s user” without checking a transfer can move access the wrong way when RevenueCat aliases an anonymous ID onto a custom ID.</p>
+        <p>The reconciliation work is unglamorous and necessary: for each event, identify the RevenueCat app user, map that to the Supabase user, write the entitlement that event implies, and make the write idempotent so a retry does not grant twice or revoke the wrong person. We treated refunds, transfers, and replayed webhooks as part of the same problem, not as follow-up tickets.</p>
+        <p>That write path also has to survive a crash. If a worker dies after seeing a webhook and before committing the entitlement, the next attempt should finish the same logical event rather than skip it or apply it twice. We exercised abandoned-lease recovery with separate Postgres sessions so one session could take over a lease another session had left behind. We did not independently verify recovery by killing a live OS process, so that remaining case should not be claimed as proven.</p>
+
+        <h2>What to run in sandbox before you trust it</h2>
+        <p>A single successful purchase is not an acceptance suite. The cases we write down and run with a founder in sandbox are:</p>
+        <ul class="list list--check">
+          <li>Purchase on iPhone or iPad sandbox, then confirm the same entitlement on web.</li>
+          <li>Subscribe on the web through Stripe, then confirm the Capacitor app unlocks for that signed-in user.</li>
+          <li>Renewal and cancellation, from the store sandbox and from the Stripe side.</li>
+          <li>Refund, and the access revocation that should follow.</li>
+          <li>Restore purchases on a new install of the same account.</li>
+          <li>Sign out and sign in as a different Supabase user, and confirm premium does not leak.</li>
+        </ul>
+        <p>Those are also the cases that catch the paywall bug this article started with. If you only test “I tapped Subscribe in the iOS sandbox while already logged in,” you will ship the web-to-app hole.</p>
+
+        <h2>A short checklist</h2>
+        <ul class="list list--check">
+          <li>Configure RevenueCat once, with the public SDK key, when the Capacitor app is ready.</li>
+          <li>After Supabase Auth has a user, call <code>Purchases.logIn</code> with <code>user.id</code>.</li>
+          <li>Call <code>Purchases.logOut</code> when the Supabase session ends.</li>
+          <li>Attach Stripe web subscriptions to that same RevenueCat customer; do not expect the App Store to know about a website payment.</li>
+          <li>Decide access on the server from the entitlement, not from a client-side premium flag.</li>
+          <li>Handle purchase, renewal, cancellation, refund, restore, and transfer in one reconciliation path, and make that path safe to retry.</li>
+          <li>Run the sandbox suite on a real device — we used an iPad for the purchase path — not only in a simulated fixture.</li>
+        </ul>
+        <p>If paid access already drifts between your web app and your Capacitor app, the fit check on <a href="https://appcontinuity.com/">https://appcontinuity.com</a> is the place to describe where it shows up.</p>
+
+        <h2>Sources</h2>
+        <ul class="list list--check">
+          <li>RevenueCat, Identifying Customers: <a href="https://www.revenuecat.com/docs/customers/identifying-customers">https://www.revenuecat.com/docs/customers/identifying-customers</a></li>
+          <li>RevenueCat, Configuring the SDK: <a href="https://www.revenuecat.com/docs/getting-started/configuring-sdk">https://www.revenuecat.com/docs/getting-started/configuring-sdk</a></li>
+          <li>RevenueCat, Capacitor installation: <a href="https://www.revenuecat.com/docs/getting-started/installation/capacitor">https://www.revenuecat.com/docs/getting-started/installation/capacitor</a></li>
+        </ul>
+      </div>
+      <div class="article-cta">
+        <h2>Book a fit check</h2>
+        <p>If this is the drift you are seeing, tell us about your app. If the stack matches, we will email you to confirm scope. Prices for the Continuity Audit, Integration, and Continuity Care are on the site.</p>
+        <div class="ctas">
+          <a class="btn" href="/#contact">Book a fit check</a>
+          <a class="btn btn--ghost" href="/#pricing">See pricing</a>
+        </div>
+      </div>
+    </article>
+  </main>
+  <footer class="foot">
+    <a class="loop" href="/">Back to AppContinuity</a>
+    <p class="mono small">© 2026 AppContinuity · <a href="/articles/">Articles</a> · <a href="mailto:contact@appcontinuity.com">contact@appcontinuity.com</a></p>
+    <p class="small muted">RevenueCat, Stripe, Supabase, Apple, App Store, Google Play and Android are trademarks of their respective owners. AppContinuity is an independent service and is not affiliated with them.</p>
+  </footer>
+  <script type="module" src="/src/article.js"></script>
+</body>
+</html>
