@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Optional: set to a form backend URL (Formspree, Basin, a serverless function…)
 // to actually deliver fit-check requests. Empty = show the thank-you state only.
-const FORM_ENDPOINT = '';
+const FORM_ENDPOINT = 'https://formsubmit.co/ajax/ujockn-86qf0n+fitcheck@mail.grokbot.com';
 
 const root = document.documentElement;
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
