@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Map Supabase user IDs to RevenueCat — AppContinuity</title>
+  <meta name="description" content="Wire Supabase Auth user.id to RevenueCat logIn and logOut so account switches do not hand the next person someone else’s premium." />
+  <link rel="canonical" href="https://appcontinuity.com/articles/mapping-supabase-auth-to-revenuecat/" />
+  <meta name="theme-color" content="#05070d" />
+  <meta name="color-scheme" content="dark" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="AppContinuity" />
+  <meta property="og:url" content="https://appcontinuity.com/articles/mapping-supabase-auth-to-revenuecat/" />
+  <meta property="og:title" content="Map Supabase user IDs to RevenueCat — AppContinuity" />
+  <meta property="og:description" content="Wire Supabase Auth user.id to RevenueCat logIn and logOut so account switches do not hand the next person someone else’s premium." />
+  <meta property="og:image" content="https://appcontinuity.com/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-11-09" />
+  <meta property="article:author" content="AppContinuity" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Map Supabase user IDs to RevenueCat — AppContinuity" />
+  <meta name="twitter:description" content="Wire Supabase Auth user.id to RevenueCat logIn and logOut so account switches do not hand the next person someone else’s premium." />
+  <meta name="twitter:image" content="https://appcontinuity.com/og.png" />
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Mapping Supabase Auth user IDs to RevenueCat without granting the wrong person’s access",
+    "description": "Wire Supabase Auth user.id to RevenueCat logIn and logOut so account switches do not hand the next person someone else’s premium.",
+    "datePublished": "2026-11-09",
+    "dateModified": "2026-11-09",
+    "author": {
+      "@type": "Organization",
+      "name": "AppContinuity",
+      "url": "https://appcontinuity.com/about/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AppContinuity",
+      "url": "https://appcontinuity.com/"
+    },
+    "mainEntityOfPage": "https://appcontinuity.com/articles/mapping-supabase-auth-to-revenuecat/",
+    "url": "https://appcontinuity.com/articles/mapping-supabase-auth-to-revenuecat/",
+    "image": "https://appcontinuity.com/og.png"
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top">
+    <a class="brand" href="/" aria-label="AppContinuity, home">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".45"/><circle cx="16" cy="16" r="4.2" fill="#7cf2d0"/><circle cx="16" cy="5" r="2" fill="currentColor"/><circle cx="25.5" cy="21.5" r="2" fill="currentColor"/><circle cx="6.5" cy="21.5" r="2" fill="currentColor"/></svg>
+      <span>AppContinuity</span>
+    </a>
+    <nav class="nav" aria-label="Site">
+      <a href="/#problem">Problem</a>
+      <a href="/#scope">Scope</a>
+      <a href="/#process">Process</a>
+      <a href="/#fit">Fit</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/articles/" aria-current="page">Articles</a>
+      <a href="/checklist/">Checklist</a>
+      <a href="/about/">About</a>
+      <a href="/#contact-us">Contact</a>
+    </nav>
+    <div class="top__actions">
+      <a class="btn btn--small" href="/#contact">Book a fit check</a>
+    </div>
+  </header>
+  <main id="main" class="article-main">
+    <article class="article">
+      <p class="eyebrow mono"><a href="/articles/">Articles</a></p>
+      <h1>Mapping Supabase Auth user IDs to RevenueCat without granting the wrong person’s access</h1>
+      <p class="byline"><a href="/about/">AppContinuity, solo developer</a> · Published 9 November 2026</p>
+      <div class="prose">
+        <p>Official RevenueCat docs already cover generic identifying customers. This piece is about the exact stack: a React app wrapped with Capacitor, people signing in with Supabase Auth, subscriptions already on Stripe for the web, and RevenueCat deciding the same entitlement on iPhone and Android — without handing the next person on the phone someone else’s premium.</p>
+        <p>It pairs with <a href="/articles/why-a-stripe-subscriber-hits-a-paywall/">why a Stripe subscriber hits a Capacitor paywall</a>: that article is the web-to-app mismatch; this one is the identity wiring that has to be correct first.</p>
+
+        <h2>The failure mode</h2>
+        <p>You configure RevenueCat early. A <code>$RCAnonymousID:…</code> appears. Someone buys, or a Stripe subscription is later attached to the wrong id. Or you call <code>logIn</code> with an email. Or you sign out of Supabase and leave RevenueCat identified. The next session still looks “paid.” Support hears about it before your dashboards agree.</p>
+        <p>Paid access is only safe when three identifiers line up on purpose:</p>
+        <ol>
+          <li>Supabase <code>user.id</code> (stable UUID from Auth)</li>
+          <li>RevenueCat App User ID (custom id after <code>logIn</code>, not email)</li>
+          <li>Whatever you use to attach Stripe to that same RevenueCat customer</li>
+        </ol>
+        <p>Until they do, web, store, and app each answer “is this person paid?” alone.</p>
+
+        <h2>Configure once, identify after Auth</h2>
+        <p>RevenueCat’s Capacitor flow for “I get my user id later” is: configure without a custom id, then <code>logIn</code> when Auth has a session (<a href="https://www.revenuecat.com/docs/customers/identifying-customers">Identifying Customers</a>):</p>
+        <pre><code>import { Purchases } from '@revenuecat/purchases-capacitor';
+import { supabase } from './supabase';
+
+await Purchases.configure({ apiKey: publicSdkKey });
+
+const { data: { user } } = await supabase.auth.getUser();
+if (user) {
+  await Purchases.logIn({ appUserID: user.id });
+}
+
+supabase.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' &amp;&amp; session?.user) {
+    await Purchases.logIn({ appUserID: session.user.id });
+  }
+  if (event === 'SIGNED_OUT') {
+    await Purchases.logOut();
+  }
+});</code></pre>
+        <p>Rules that matter on this stack:</p>
+        <ul class="list list--check">
+          <li>Use <strong><code>user.id</code></strong>, not email. RevenueCat explicitly advises against emails as App User IDs (guessability and compliance). Supabase emails can change; the user id does not.</li>
+          <li><strong>Do not hard-code</strong> an App User ID into <code>configure</code>. Every install would share purchases.</li>
+          <li><strong>Configure once.</strong> Switching identity is <code>logIn</code>, not a second <code>configure</code>.</li>
+          <li>On <strong>SIGNED_OUT</strong>, call <strong><code>logOut()</code></strong> so RevenueCat creates a fresh anonymous id. If you only clear the Supabase session, the SDK can still report the previous customer’s entitlements.</li>
+        </ul>
+        <p>Supabase’s client exposes <code>onAuthStateChange</code> for exactly this kind of side effect (<a href="https://supabase.com/docs/guides/auth">Supabase Auth docs</a>). Wire RevenueCat there (or in one shared auth helper), not ad hoc in every screen.</p>
+
+        <h2>What aliasing does — and does not — merge</h2>
+        <p>When the current id is anonymous and you <code>logIn</code> with a custom id, RevenueCat may <strong>merge</strong> (alias) that anonymous customer into the custom id. Webhook fields then often show <code>original_app_user_id</code> as the anonymous id and <code>app_user_id</code> as the custom id, with both in <code>aliases</code>.</p>
+        <p>When the current id is <strong>already a custom id</strong> and you <code>logIn</code> with a different custom id, RevenueCat’s documented behavior is: log out the current custom id and log in the new one — <strong>no merge</strong>. That is the intended account switch. You do not need to call <code>logOut</code> first for that switch, but you <strong>should</strong> call <code>logOut</code> when the user signs out of your app so the logged-out device is not still identified as them.</p>
+        <p>If your backend keys premium only on <code>app_user_id</code> and ignores aliases / <code>original_app_user_id</code>, restores and “bought while anonymous, then signed in” flows look like missing subscribers. Resolve any of the merged ids to the same Supabase row.</p>
+
+        <h2>Gate on entitlements, not on “we saw a login”</h2>
+        <p>After identity is correct, access is still <code>customerInfo.entitlements.active['your_entitlement_id']</code> (or the same fact from <code>GET /subscribers/{id}</code> on the server) — not “Supabase session exists” and not a boolean you wrote to <code>AsyncStorage</code>.</p>
+        <p>Client-side <code>CustomerInfo</code> is cached so premium can work offline for a grace period after it was known active; <code>logOut</code> clears that cache. Treat cache as UX, not as the authority your API trusts.</p>
+
+        <h2>Stripe must use the same App User ID</h2>
+        <p>Importing a Stripe subscription into RevenueCat only unlocks the Capacitor app if the Purchases SDK is identified with the <strong>same</strong> App User ID you attached the Stripe purchase to (<a href="https://www.revenuecat.com/docs/web/integrations/stripe/track-external-purchases">Track External Purchases</a>). Practical pattern:</p>
+        <ol>
+          <li>Checkout completes while the user is signed in with Supabase.</li>
+          <li>Your backend posts the Stripe <code>sub_…</code> (or Checkout Session id) to RevenueCat with <code>app_user_id: &lt;supabase user.id&gt;</code> and <code>X-Platform: stripe</code>.</li>
+          <li>The Capacitor app, after <code>logIn</code> with that same id, sees the entitlement.</li>
+        </ol>
+        <p>If Stripe was attached to an anonymous id, or to an email string, the signed-in Supabase user will still hit a paywall. That is the story in the <a href="/articles/why-a-stripe-subscriber-hits-a-paywall/">first article</a>; identity is the prerequisite.</p>
+
+        <h2>Sandbox cases that catch the wrong person</h2>
+        <p>Before you trust production:</p>
+        <ol>
+          <li>User A purchases (or gets a Stripe attach) while identified as A → entitlement active.</li>
+          <li>Sign out (Supabase <strong>and</strong> <code>Purchases.logOut</code>) → paywall for anonymous / empty session.</li>
+          <li>Sign in as User B → no A entitlement.</li>
+          <li>Sign back in as A on a fresh install → <code>logIn(A)</code> then restore if needed → entitlement returns for A only.</li>
+          <li>Purchase while anonymous, then <code>logIn(A)</code> → purchase still on A (alias path); backend accepts alias ids.</li>
+        </ol>
+        <p>A printable checklist that includes these cases: <a href="/checklist/">the free entitlement checklist</a>.</p>
+
+        <h2>Short checklist</h2>
+        <ul class="list list--check">
+          <li>Configure RevenueCat once with the public SDK key.</li>
+          <li>After Supabase Auth has a user, <code>Purchases.logIn({ appUserID: user.id })</code>.</li>
+          <li>On Supabase sign-out, <code>Purchases.logOut()</code>.</li>
+          <li>Never use email as the App User ID.</li>
+          <li>Attach Stripe to that same custom id.</li>
+          <li>Server gates on RevenueCat entitlements for that user, not a client flag.</li>
+          <li>Webhook / alias handling resolves anonymous and custom ids to one Supabase user.</li>
+          <li>Run account-switch and anonymous-then-login cases in sandbox.</li>
+        </ul>
+
+        <h2>Sources</h2>
+        <ul class="list list--check">
+          <li>RevenueCat, Identifying Customers: <a href="https://www.revenuecat.com/docs/customers/identifying-customers">https://www.revenuecat.com/docs/customers/identifying-customers</a></li>
+          <li>RevenueCat, Getting Subscription Status: <a href="https://www.revenuecat.com/docs/customers/customer-info">https://www.revenuecat.com/docs/customers/customer-info</a></li>
+          <li>RevenueCat, Track External Purchases (Stripe): <a href="https://www.revenuecat.com/docs/web/integrations/stripe/track-external-purchases">https://www.revenuecat.com/docs/web/integrations/stripe/track-external-purchases</a></li>
+          <li>RevenueCat, Caching: <a href="https://www.revenuecat.com/docs/test-and-launch/debugging/caching">https://www.revenuecat.com/docs/test-and-launch/debugging/caching</a></li>
+          <li>RevenueCat Capacitor SDK <code>logIn</code> / <code>logOut</code>: <a href="https://github.com/revenuecat/purchases-capacitor">https://github.com/revenuecat/purchases-capacitor</a></li>
+          <li>Supabase Auth (sessions / <code>onAuthStateChange</code>): <a href="https://supabase.com/docs/guides/auth">https://supabase.com/docs/guides/auth</a></li>
+        </ul>
+      </div>
+      <div class="article-cta">
+        <h2>Book a fit check</h2>
+        <p>If this identity drift is already live in your app, start with the free <a href="/checklist/">entitlement checklist</a>, or <a href="/#contact">book a fit check</a> if you want the Integration done on this stack. Related reading: <a href="/articles/why-a-stripe-subscriber-hits-a-paywall/">why a Stripe subscriber hits a Capacitor paywall</a>.</p>
+        <div class="ctas">
+          <a class="btn" href="/#contact">Book a fit check</a>
+          <a class="btn btn--ghost" href="/checklist/">Open the checklist</a>
+        </div>
+      </div>
+    </article>
+  </main>
+  <footer class="foot">
+    <a class="loop" href="/">Back to AppContinuity</a>
+    <p class="mono small">© 2026 AppContinuity · <a href="/about/">About</a> · <a href="/privacy/">Privacy</a> · <a href="/checklist/">Checklist</a> · <a href="/articles/">Articles</a> · <a href="mailto:contact@appcontinuity.com">contact@appcontinuity.com</a></p>
+    <p class="small muted">RevenueCat, Stripe, Supabase, Apple, App Store, Google Play and Android are trademarks of their respective owners. AppContinuity is an independent service and is not affiliated with them.</p>
+  </footer>
+  <script type="module" src="/src/article.js"></script>
+</body>
+</html>

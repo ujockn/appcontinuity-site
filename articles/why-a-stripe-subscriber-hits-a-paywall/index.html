@@ -83,6 +83,7 @@
       <div class="prose">
         <p>The most common continuity failure we see in this stack is also the one founders describe first: someone pays on the web, opens the iPhone app, and meets a paywall. The web app is sure they are subscribed. The store, RevenueCat, and your Supabase session each have a different idea of who “they” are.</p>
         <p>This piece is about that mismatch in a React app wrapped with Capacitor, signed in through Supabase Auth, and billed on the web through Stripe — and what we learned wiring the same entitlement through RevenueCat, including a sandbox purchase run end to end on an iPad.</p>
+        <p>For the identity wiring itself — <code>logIn</code> with Supabase <code>user.id</code>, <code>logOut</code> on sign-out, and alias rules — see <a href="/articles/mapping-supabase-auth-to-revenuecat/">mapping Supabase Auth user IDs to RevenueCat</a>.</p>
 
         <h2>Three answers to “is this person paid?”</h2>
         <p>On the web, paid access usually means “this Supabase user has an active Stripe subscription.” In the Capacitor app, paid access often starts as “RevenueCat says this <code>appUserID</code> has an active entitlement,” and that ID may have been created before anyone signed in.</p>

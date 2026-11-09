@@ -14,6 +14,7 @@ export default defineConfig({
         main: resolve(dir, 'index.html'),
         articles: resolve(dir, 'articles/index.html'),
         paywall: resolve(dir, 'articles/why-a-stripe-subscriber-hits-a-paywall/index.html'),
+        mapping: resolve(dir, 'articles/mapping-supabase-auth-to-revenuecat/index.html'),
         about: resolve(dir, 'about/index.html'),
         privacy: resolve(dir, 'privacy/index.html'),
         checklist: resolve(dir, 'checklist/index.html'),
