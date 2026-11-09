@@ -39,6 +39,7 @@ const KEYS = [
   { cam: [0.6, 1.2, 14.5], look: [0, 0.1, 0], desync: 0, orbit: 1.5, tilt: -0.04, shift: 0.05 },
   { cam: [2.4, 4.6, 12.2], look: [0, -0.4, 0], desync: 0, orbit: 2.4, tilt: 0, shift: 0.02 },
   { cam: [0, -0.2, 13.5], look: [0, 0.3, 0], desync: 0, orbit: 4.3, tilt: 0.05, shift: 0.04 },
+  { cam: [1.1, 1.8, 13.4], look: [0, 0.15, 0], desync: 0, orbit: 5.2, tilt: -0.02, shift: 0.03 },
   { cam: [0, 1.0, 14.5], look: [0, 0, 0], desync: 0, orbit: Math.PI * 2, tilt: 0, shift: 0.02 },
 ];
 
