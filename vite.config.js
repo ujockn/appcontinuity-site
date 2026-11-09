@@ -16,6 +16,7 @@ export default defineConfig({
         paywall: resolve(dir, 'articles/why-a-stripe-subscriber-hits-a-paywall/index.html'),
         about: resolve(dir, 'about/index.html'),
         privacy: resolve(dir, 'privacy/index.html'),
+        checklist: resolve(dir, 'checklist/index.html'),
       },
     },
   },

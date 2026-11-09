@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Capacitor + RevenueCat entitlement checklist — AppContinuity</title>
+  <meta name="description" content="A free checklist for founders: confirm paid access matches across Stripe web, iPhone and Android with RevenueCat, Supabase Auth and sandbox tests." />
+  <link rel="canonical" href="https://appcontinuity.com/checklist/" />
+  <meta name="theme-color" content="#05070d" />
+  <meta name="color-scheme" content="dark" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="AppContinuity" />
+  <meta property="og:url" content="https://appcontinuity.com/checklist/" />
+  <meta property="og:title" content="Capacitor + RevenueCat entitlement checklist — AppContinuity" />
+  <meta property="og:description" content="A free checklist for founders: confirm paid access matches across Stripe web, iPhone and Android with RevenueCat, Supabase Auth and sandbox tests." />
+  <meta property="og:image" content="https://appcontinuity.com/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-11-09" />
+  <meta property="article:author" content="AppContinuity" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Capacitor + RevenueCat entitlement checklist — AppContinuity" />
+  <meta name="twitter:description" content="Confirm paid access matches across Stripe web, iPhone and Android with RevenueCat and Supabase Auth." />
+  <meta name="twitter:image" content="https://appcontinuity.com/og.png" />
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Capacitor + RevenueCat + Stripe entitlement checklist",
+    "description": "A practical checklist to confirm paid access matches across Stripe on the web, iPhone and Android in a React/Capacitor app with Supabase Auth and RevenueCat.",
+    "datePublished": "2026-11-09",
+    "dateModified": "2026-11-09",
+    "author": {
+      "@type": "Organization",
+      "name": "AppContinuity",
+      "url": "https://appcontinuity.com/about/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AppContinuity",
+      "url": "https://appcontinuity.com/"
+    },
+    "mainEntityOfPage": "https://appcontinuity.com/checklist/",
+    "url": "https://appcontinuity.com/checklist/",
+    "image": "https://appcontinuity.com/og.png",
+    "totalTime": "PT45M",
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Identify the Supabase user in RevenueCat",
+        "text": "Configure Purchases once, call logIn with the stable Supabase user id after auth, and call logOut when the Supabase session ends."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Attach Stripe web subscriptions to the same customer",
+        "text": "Import Stripe subscriptions into RevenueCat for the same app user id that the Capacitor app uses, and confirm one entitlement unlocks web and mobile."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Gate on entitlements and sync via webhooks",
+        "text": "Check entitlements.active, restore from a user action, and update Supabase from a RevenueCat webhook re-read rather than trusting a single event payload."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Run the sandbox suite",
+        "text": "Exercise purchase, web-to-app unlock, renewal, cancellation, refund, restore, account switching, and offline cache behavior before trusting production."
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top">
+    <a class="brand" href="/" aria-label="AppContinuity, home">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".45"/><circle cx="16" cy="16" r="4.2" fill="#7cf2d0"/><circle cx="16" cy="5" r="2" fill="currentColor"/><circle cx="25.5" cy="21.5" r="2" fill="currentColor"/><circle cx="6.5" cy="21.5" r="2" fill="currentColor"/></svg>
+      <span>AppContinuity</span>
+    </a>
+    <nav class="nav" aria-label="Site">
+      <a href="/#problem">Problem</a>
+      <a href="/#scope">Scope</a>
+      <a href="/#process">Process</a>
+      <a href="/#fit">Fit</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/articles/">Articles</a>
+      <a href="/checklist/" aria-current="page">Checklist</a>
+      <a href="/about/">About</a>
+      <a href="/#contact-us">Contact</a>
+    </nav>
+    <div class="top__actions">
+      <a class="btn btn--small" href="/#contact">Book a fit check</a>
+    </div>
+  </header>
+  <main id="main" class="article-main">
+    <article class="article checklist">
+      <p class="eyebrow mono"><a href="/articles/">Articles</a> · Free checklist</p>
+      <h1>Capacitor + RevenueCat + Stripe entitlement checklist</h1>
+      <p class="byline"><a href="/about/">AppContinuity, solo developer</a> · Published 9 November 2026 · Free · No email required</p>
+      <div class="prose">
+        <p>Use this when a React app wrapped with Capacitor already signs people in with Supabase Auth and sells subscriptions on the web through Stripe — and you want App Store and Play purchases to unlock the <em>same</em> paid access. Tick what you have verified. Print it if that helps. Nothing here is gated.</p>
+        <p class="print-hint no-print"><button type="button" class="btn btn--ghost btn--small" id="print-checklist">Print this checklist</button></p>
+
+        <h2>1. App user IDs and aliasing with Supabase Auth</h2>
+        <ul class="check-list">
+          <li><label><input type="checkbox" /> <span><code>Purchases.configure</code> runs once with the public SDK key. You do not hard-code an <code>appUserID</code> into configure for every install.</span></label></li>
+          <li><label><input type="checkbox" /> <span>After Supabase Auth has a session, you call <code>Purchases.logIn({ appUserID: user.id })</code> with the stable Supabase user UUID — not email, not a display name.</span></label></li>
+          <li><label><input type="checkbox" /> <span>When the Supabase session ends, you call <code>Purchases.logOut()</code> so the next person on the device does not inherit the previous entitlement.</span></label></li>
+          <li><label><input type="checkbox" /> <span>Switching from one signed-in custom ID to another uses <code>logIn</code> with the new id (RevenueCat logs the previous custom id out; no merge). You verified this with two test accounts.</span></label></li>
+          <li><label><input type="checkbox" /> <span>In the RevenueCat dashboard, the customer for your test user shows the same custom App User ID as Supabase — not only a <code>$RCAnonymousID:</code> placeholder after login.</span></label></li>
+          <li><label><input type="checkbox" /> <span>If a purchase happened while anonymous, then <code>logIn</code> ran, webhook payloads may show <code>original_app_user_id</code> as the anonymous id and <code>app_user_id</code> as the custom id, with both in <code>aliases</code>. Your backend can resolve either to the same person.</span></label></li>
+        </ul>
+        <p class="note-inline">Official reference: <a href="https://www.revenuecat.com/docs/customers/identifying-customers">Identifying Customers</a>.</p>
+
+        <h2>2. Stripe → RevenueCat syncing</h2>
+        <ul class="check-list">
+          <li><label><input type="checkbox" /> <span>A Stripe web subscription is attached to the <em>same</em> RevenueCat App User ID the Capacitor app uses after Supabase login. A website payment alone does not create an App Store transaction.</span></label></li>
+          <li><label><input type="checkbox" /> <span>External Stripe purchases are imported into RevenueCat (POST <code>/v1/receipts</code> with <code>X-Platform: stripe</code>, or automatic Stripe server notifications with “track new purchases” enabled as documented).</span></label></li>
+          <li><label><input type="checkbox" /> <span>When posting manually, <code>fetch_token</code> is the Stripe subscription id (<code>sub_…</code>) or Checkout Session id, and <code>app_user_id</code> is the Supabase-mapped custom id.</span></label></li>
+          <li><label><input type="checkbox" /> <span>Stripe webhook events for RevenueCat are limited to the documented set (subscription create/update/delete, checkout completed, charge refunded, invoice updated). Extra events cause Stripe to disable the endpoint.</span></label></li>
+          <li><label><input type="checkbox" /> <span>You know whether RevenueCat registers the Stripe subscription when the invoice is created or when it is paid, and your “web subscriber opens the app” test matches that setting.</span></label></li>
+          <li><label><input type="checkbox" /> <span>After a web subscribe, <code>CustomerInfo</code> in the Capacitor app shows the expected active entitlement for that signed-in user without a separate “also check Stripe from the phone” path.</span></label></li>
+        </ul>
+        <p class="note-inline">Official references: <a href="https://www.revenuecat.com/docs/web/integrations/stripe/track-external-purchases">Track External Purchases</a>, <a href="https://www.revenuecat.com/docs/platform-resources/server-notifications/stripe-server-notifications">Stripe Server Notifications</a>.</p>
+
+        <h2>3. Entitlement naming and client gates</h2>
+        <ul class="check-list">
+          <li><label><input type="checkbox" /> <span>One (or a few) entitlement identifiers in the RevenueCat dashboard — for example <code>premium</code> — map to the App Store, Play and Stripe products that should unlock the same access.</span></label></li>
+          <li><label><input type="checkbox" /> <span>The app and any server gate check <code>customerInfo.entitlements.active['your_id']</code> (or the REST subscriber entitlements), not product ids and not “any past purchase”.</span></label></li>
+          <li><label><input type="checkbox" /> <span>The entitlement string in code matches the dashboard identifier exactly. A typo silently locks everyone out.</span></label></li>
+          <li><label><input type="checkbox" /> <span>The client does not award access from a local premium flag. Cached <code>CustomerInfo</code> is for UI; the server decision is keyed to the signed-in Supabase user.</span></label></li>
+          <li><label><input type="checkbox" /> <span>A <code>CustomerInfo</code> update listener (or equivalent) refreshes the UI after purchase, restore, renewal or expiration without requiring an app restart.</span></label></li>
+        </ul>
+        <p class="note-inline">Official reference: <a href="https://www.revenuecat.com/docs/customers/customer-info">Getting Subscription Status</a>.</p>
+
+        <h2>4. Restore purchases</h2>
+        <ul class="check-list">
+          <li><label><input type="checkbox" /> <span>There is a user-visible Restore control. <code>restorePurchases</code> is only called from that action (it can trigger store sign-in prompts).</span></label></li>
+          <li><label><input type="checkbox" /> <span>Restore is not a substitute for <code>logIn</code>. On a new device you identify the Supabase user first, then restore if the store account should pull receipts onto that customer.</span></label></li>
+          <li><label><input type="checkbox" /> <span>You know your project’s restore / transfer behavior setting, and you tested what happens when a receipt is already attached to another App User ID.</span></label></li>
+          <li><label><input type="checkbox" /> <span>Programmatic sync (for migrations) uses <code>syncPurchases</code> where appropriate, not a background <code>restorePurchases</code>.</span></label></li>
+        </ul>
+        <p class="note-inline">Official reference: <a href="https://www.revenuecat.com/docs/getting-started/restoring-purchases">Restoring Purchases</a>.</p>
+
+        <h2>5. Webhooks into Supabase (or your backend)</h2>
+        <ul class="check-list">
+          <li><label><input type="checkbox" /> <span>A RevenueCat webhook integration posts to your HTTPS endpoint with an authorization header you verify on every request.</span></label></li>
+          <li><label><input type="checkbox" /> <span>You return 200 quickly and process asynchronously. Non-200 responses are retried with backoff.</span></label></li>
+          <li><label><input type="checkbox" /> <span>Events are deduplicated by <code>event.id</code> so retries do not double-grant or double-revoke.</span></label></li>
+          <li><label><input type="checkbox" /> <span>For access changes you re-read the subscriber (<code>GET /subscribers/{app_user_id}</code>) and store the entitlements RevenueCat reports now — you do not revoke solely because a <code>CANCELLATION</code> arrived.</span></label></li>
+          <li><label><input type="checkbox" /> <span><code>CANCELLATION</code> vs <code>EXPIRATION</code> vs <code>BILLING_ISSUE</code> are handled correctly: cancel often keeps access until expiry; billing issues are not an immediate revoke; expiration is applied through the re-read.</span></label></li>
+          <li><label><input type="checkbox" /> <span><code>TRANSFER</code> events re-read every id on both <code>transferred_from</code> and <code>transferred_to</code>. You do not merge those users in Supabase by accident.</span></label></li>
+          <li><label><input type="checkbox" /> <span>The path that maps <code>app_user_id</code> / aliases to a Supabase user is idempotent and safe if the worker crashes mid-write.</span></label></li>
+        </ul>
+        <p class="note-inline">Official reference: <a href="https://www.revenuecat.com/docs/integrations/webhooks">Webhooks</a>.</p>
+
+        <h2>6. Sandbox test cases</h2>
+        <ul class="check-list">
+          <li><label><input type="checkbox" /> <span>Purchase in iPhone or iPad sandbox (or Play license testers), then confirm the same entitlement on the web for that Supabase user.</span></label></li>
+          <li><label><input type="checkbox" /> <span>Subscribe on the web through Stripe, then confirm the Capacitor app unlocks for that signed-in user without a store purchase.</span></label></li>
+          <li><label><input type="checkbox" /> <span>Renewal and cancellation from the store sandbox and from the Stripe side both update access as expected.</span></label></li>
+          <li><label><input type="checkbox" /> <span>Refund path: access revokes when RevenueCat says the entitlement is gone (via webhook re-read), not only when a dashboard looks “cancelled.”</span></label></li>
+          <li><label><input type="checkbox" /> <span>Restore on a fresh install of the same store account + same Supabase user.</span></label></li>
+          <li><label><input type="checkbox" /> <span>Sign out and sign in as a different Supabase user: premium does not leak.</span></label></li>
+          <li><label><input type="checkbox" /> <span>You ran at least one of these on a real device, not only in a mocked fixture.</span></label></li>
+        </ul>
+
+        <h2>7. Offline and cache states</h2>
+        <ul class="check-list">
+          <li><label><input type="checkbox" /> <span>You call <code>getCustomerInfo()</code> when the user hits premium content; the SDK may return cached info synchronously and refresh in the background.</span></label></li>
+          <li><label><input type="checkbox" /> <span>You understand RevenueCat’s offline grace for previously active entitlements (documented as up to three days while offline) and that offerings may not persist across launches the same way.</span></label></li>
+          <li><label><input type="checkbox" /> <span><code>logOut</code> clears the SDK cache; you do not rely on stale premium UI after sign-out.</span></label></li>
+          <li><label><input type="checkbox" /> <span>Platform server notifications (App Store / Play / Stripe as applicable) are connected so <code>CustomerInfo</code> and webhooks update faster than “next app open.”</span></label></li>
+          <li><label><input type="checkbox" /> <span>You do not treat “empty entitlements while offline” as proof the user never subscribed — and you do not invent a second source of truth on the device to paper over it.</span></label></li>
+        </ul>
+        <p class="note-inline">Official references: <a href="https://www.revenuecat.com/docs/test-and-launch/debugging/caching">Caching</a>, <a href="https://www.revenuecat.com/docs/customers/customer-info">CustomerInfo</a>.</p>
+
+        <h2>If several boxes stay empty</h2>
+        <p>That usually means identity, Stripe attachment, or webhook reconciliation — not a missing paywall button. The article <a href="/articles/why-a-stripe-subscriber-hits-a-paywall/">Why a Stripe subscriber hits a paywall in your Capacitor iPhone app</a> walks through the most common failure. If you want the messy middle done for you on this stack, the next step is a free fit check.</p>
+      </div>
+      <div class="article-cta no-print">
+        <h2>Book a fit check</h2>
+        <p>If paid access already drifts between web and the Capacitor app, tell us where. If the stack matches, we will email you to confirm scope. This checklist stays free either way.</p>
+        <div class="ctas">
+          <a class="btn" href="/#contact">Book a fit check</a>
+          <a class="btn btn--ghost" href="/#pricing">See pricing</a>
+        </div>
+      </div>
+    </article>
+  </main>
+  <footer class="foot">
+    <a class="loop" href="/">Back to AppContinuity</a>
+    <p class="mono small">© 2026 AppContinuity · <a href="/about/">About</a> · <a href="/privacy/">Privacy</a> · <a href="/checklist/">Checklist</a> · <a href="/articles/">Articles</a> · <a href="mailto:contact@appcontinuity.com">contact@appcontinuity.com</a></p>
+    <p class="small muted">RevenueCat, Stripe, Supabase, Apple, App Store, Google Play and Android are trademarks of their respective owners. AppContinuity is an independent service and is not affiliated with them.</p>
+  </footer>
+  <script type="module" src="/src/article.js"></script>
+  <script type="module">
+    const btn = document.getElementById('print-checklist');
+    if (btn) btn.addEventListener('click', () => window.print());
+  </script>
+</body>
+</html>

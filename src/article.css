@@ -69,3 +69,53 @@
   letter-spacing: -0.015em;
   margin: 0 0 10px;
 }
+
+
+/* Checklist */
+.check-list {
+  list-style: none;
+  margin: 0 0 1.4em;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+  max-width: 64ch;
+}
+.check-list li { padding: 0; }
+.check-list li::before { display: none; content: none; }
+.check-list label {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  align-items: start;
+  color: var(--ink);
+  cursor: pointer;
+  line-height: 1.55;
+}
+.check-list input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.check-list code { font-size: 0.86em; }
+.note-inline {
+  color: var(--muted);
+  font-size: 14px;
+  margin: -0.4em 0 1.8em;
+  max-width: 64ch;
+}
+.print-hint { margin: 22px 0 0; }
+
+@media print {
+  :root { --bg: #fff; --ink: #111; --muted: #333; --line: #ccc; --accent: #0a7; --panel: #f7f7f7; }
+  body { background: #fff; color: #111; font-size: 12pt; }
+  .top, .foot, .skip, .no-print, .loader, #world, .world-fallback, .scrim, .labels { display: none !important; }
+  .article-main { padding: 0; }
+  .article { max-width: none; }
+  .prose a { color: #111; text-decoration: underline; }
+  .check-list label { break-inside: avoid; }
+  .byline a { color: #111; }
+  h1, h2 { break-after: avoid; }
+  a[href]::after { content: ""; }
+}
