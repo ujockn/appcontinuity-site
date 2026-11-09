@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>AppContinuity — RevenueCat integration for React/Capacitor apps</title>
+  <meta name="description" content="Fixed-scope RevenueCat subscription integration and acceptance testing for founders with a React/Capacitor app, Supabase login and Stripe web subscriptions. Keep your code and accounts; paid access behaves the same on web, iPhone and Android." />
+  <link rel="canonical" href="https://appcontinuity.com/" />
+  <meta name="theme-color" content="#05070d" />
+  <meta name="color-scheme" content="dark" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AppContinuity" />
+  <meta property="og:url" content="https://appcontinuity.com/" />
+  <meta property="og:title" content="AppContinuity — one subscription, every platform" />
+  <meta property="og:description" content="Fixed-scope RevenueCat integration and acceptance testing for React/Capacitor apps using Supabase login and Stripe web subscriptions." />
+  <meta property="og:image" content="https://appcontinuity.com/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AppContinuity — one subscription, every platform" />
+  <meta name="twitter:description" content="Fixed-scope RevenueCat integration and acceptance testing for React/Capacitor apps." />
+  <meta name="twitter:image" content="https://appcontinuity.com/og.png" />
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "AppContinuity",
+    "url": "https://appcontinuity.com/",
+    "description": "Fixed-scope RevenueCat subscription integration and acceptance testing for React/Capacitor apps with Supabase login and Stripe web subscriptions.",
+    "serviceType": "Subscription integration and acceptance testing"
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader__inner">
+      <div class="loader__mark"><span class="dot"></span></div>
+      <div class="loader__label mono">Syncing entitlement</div>
+      <div class="loader__pct mono"><span id="loader-pct">0</span>%</div>
+      <div class="loader__bar"><span id="loader-bar"></span></div>
+    </div>
+  </div>
+
+  <canvas id="world" aria-hidden="true"></canvas>
+  <div class="world-fallback" aria-hidden="true"></div>
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="labels" id="labels" aria-hidden="true">
+    <button type="button" tabindex="-1" class="plabel mono" data-open="0">web · stripe</button>
+    <button type="button" tabindex="-1" class="plabel mono" data-open="1">iphone · app store</button>
+    <button type="button" tabindex="-1" class="plabel mono" data-open="2">android · play</button>
+  </div>
+
+  <header class="top">
+    <a class="brand" href="#top" aria-label="AppContinuity, back to top">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".45"/><circle cx="16" cy="16" r="4.2" fill="#7cf2d0"/><circle cx="16" cy="5" r="2" fill="currentColor"/><circle cx="25.5" cy="21.5" r="2" fill="currentColor"/><circle cx="6.5" cy="21.5" r="2" fill="currentColor"/></svg>
+      <span class="scr" data-scramble-hover>AppContinuity</span>
+    </a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#problem" data-scramble-hover>Problem</a>
+      <a href="#scope" data-scramble-hover>Scope</a>
+      <a href="#process" data-scramble-hover>Process</a>
+      <a href="#fit" data-scramble-hover>Fit</a>
+    </nav>
+    <div class="top__actions">
+      <button class="sound" id="sound" type="button" aria-pressed="false" aria-label="Sound off. Turn sound on">
+        <span class="sound__bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="sound__txt mono" aria-hidden="true">Sound off</span>
+      </button>
+      <a class="btn btn--small" href="#contact" data-scramble-hover>Book a fit check</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="sec hero" id="top" data-sec="0">
+      <div class="col">
+        <p class="eyebrow mono reveal">Fixed-scope subscription integration</p>
+        <h1 class="reveal" data-scramble>One subscription.<br />Every platform.<br /><span class="accent">Same answer.</span></h1>
+        <p class="lede reveal">RevenueCat integration and acceptance testing for founders with an existing React/Capacitor app, Supabase login and Stripe web subscriptions. You keep your code and your accounts. Paid access behaves the same on web, iPhone and Android.</p>
+        <div class="ctas reveal">
+          <a class="btn" href="#contact" data-scramble-hover>Book a fit check</a>
+          <a class="btn btn--ghost" href="#scope" data-scramble-hover>See the scope</a>
+        </div>
+        <div class="switch reveal" role="group" aria-labelledby="switch-l">
+          <span class="switch__l mono" id="switch-l">Explore by platform</span>
+          <button type="button" class="chip" data-open="0" aria-haspopup="dialog">Web</button>
+          <button type="button" class="chip" data-open="1" aria-haspopup="dialog">iPhone</button>
+          <button type="button" class="chip" data-open="2" aria-haspopup="dialog">Android</button>
+        </div>
+        <p class="hint mono reveal" aria-hidden="true"><span class="hint__line"></span>Scroll · drag the core · tap a platform</p>
+      </div>
+    </section>
+
+    <section class="sec" id="problem" data-sec="1" aria-labelledby="problem-h">
+      <div class="col">
+        <p class="eyebrow mono reveal">01 — The problem</p>
+        <h2 id="problem-h" class="reveal" data-scramble>Paid access drifts.</h2>
+        <p class="lede reveal">Every platform ends up answering “is this person paid?” on its own. The answers stop matching, and support usually finds out first.</p>
+        <ul class="list reveal">
+          <li>A customer subscribes on the web, opens the iPhone app, and meets a paywall.</li>
+          <li>An Android subscription lapses, but the web app still unlocks everything.</li>
+          <li>Refunds, restores and account switches each update a different record.</li>
+          <li>Nobody can say which source is right without checking three dashboards.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="sec" id="scope" data-sec="2" aria-labelledby="scope-h">
+      <div class="col col--wide">
+        <p class="eyebrow mono reveal">02 — What you get</p>
+        <h2 id="scope-h" class="reveal" data-scramble>A fixed scope. Three deliverables.</h2>
+        <div class="cards">
+          <article class="card reveal" tabindex="-1">
+            <span class="card__n mono">A</span>
+            <h3>RevenueCat integration</h3>
+            <p>In-app subscriptions on iPhone and Android, wired through RevenueCat inside your existing Capacitor app: offerings, purchase flow, restore and paywall hooks.</p>
+          </article>
+          <article class="card reveal" tabindex="-1">
+            <span class="card__n mono">B</span>
+            <h3>Entitlement sync</h3>
+            <p>Supabase users mapped to RevenueCat customers, and Stripe web subscriptions connected, so one entitlement decides access on web, iPhone and Android.</p>
+          </article>
+          <article class="card reveal" tabindex="-1">
+            <span class="card__n mono">C</span>
+            <h3>Acceptance test suite</h3>
+            <p>Written scenarios for purchase, renewal, cancellation, refund, restore and account switching, run in sandbox and handed over with your code.</p>
+          </article>
+        </div>
+        <p class="note reveal"><strong>Your code, your accounts.</strong> Work happens in your repository. Your RevenueCat, App Store Connect, Google Play, Stripe and Supabase accounts stay yours.</p>
+      </div>
+    </section>
+
+    <section class="sec" id="process" data-sec="3" aria-labelledby="process-h">
+      <div class="col">
+        <p class="eyebrow mono reveal">03 — How it works</p>
+        <h2 id="process-h" class="reveal" data-scramble>Four steps, in order.</h2>
+        <ol class="steps">
+          <li class="reveal"><span class="mono">1</span><div><h3>Fit check</h3><p>A short call to confirm your stack matches the scope: React and Capacitor, Supabase Auth, Stripe on the web.</p></div></li>
+          <li class="reveal"><span class="mono">2</span><div><h3>Scope in writing</h3><p>Deliverables and acceptance criteria agreed before any work starts.</p></div></li>
+          <li class="reveal"><span class="mono">3</span><div><h3>Integration</h3><p>Changes land on a branch in your repository, using access you grant and can revoke.</p></div></li>
+          <li class="reveal"><span class="mono">4</span><div><h3>Acceptance</h3><p>We run the test suite together in sandbox. You review the results and merge when it passes.</p></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="sec" id="fit" data-sec="4" aria-labelledby="fit-h">
+      <div class="col col--wide">
+        <p class="eyebrow mono reveal">04 — Who it’s for</p>
+        <h2 id="fit-h" class="reveal" data-scramble>Built for one stack, on purpose.</h2>
+        <div class="fit">
+          <div class="fit__col reveal">
+            <h3 class="mono">A good fit</h3>
+            <ul class="list list--check">
+              <li>You have a React app wrapped with Capacitor, live or close to launch.</li>
+              <li>People log in with Supabase Auth.</li>
+              <li>You already sell subscriptions on the web through Stripe.</li>
+              <li>You want in-app subscriptions on iPhone and Android to unlock the same access.</li>
+            </ul>
+          </div>
+          <div class="fit__col fit__col--no reveal">
+            <h3 class="mono">Not a fit</h3>
+            <ul class="list list--x">
+              <li>Native Swift or Kotlin, Flutter, or React Native apps.</li>
+              <li>A rebuild, a new backend, or a move to new accounts.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec cta" id="contact" data-sec="5" aria-labelledby="contact-h">
+      <div class="col">
+        <p class="eyebrow mono reveal">05 — Next step</p>
+        <h2 id="contact-h" class="reveal" data-scramble>Book a fit check.</h2>
+        <p class="lede reveal">Tell us about your app. If the stack matches, we’ll set up a short call to confirm scope.</p>
+        <form class="form reveal" id="fit-form" novalidate>
+          <div class="field">
+            <label for="f-name">Name</label>
+            <input id="f-name" name="name" type="text" autocomplete="name" required />
+          </div>
+          <div class="field">
+            <label for="f-email">Email</label>
+            <input id="f-email" name="email" type="email" autocomplete="email" required />
+          </div>
+          <div class="field field--full">
+            <label for="f-app">App link <span class="opt">(optional)</span></label>
+            <input id="f-app" name="app" type="url" inputmode="url" placeholder="https://" />
+          </div>
+          <div class="field field--full">
+            <label for="f-msg">Where does paid access drift today?</label>
+            <textarea id="f-msg" name="message" rows="4"></textarea>
+          </div>
+          <p class="form__err" id="form-err" role="alert"></p>
+          <button class="btn" type="submit" data-scramble-hover>Send</button>
+        </form>
+        <div class="thanks" id="thanks" hidden tabindex="-1">
+          <h3>Thanks — got it.</h3>
+          <p>We’ll reply to <span id="thanks-email">your email</span> about next steps.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="panel" id="panel" aria-labelledby="panel-h" aria-describedby="panel-lede">
+    <div class="panel__inner">
+      <button type="button" class="panel__close" id="panel-close" aria-label="Close platform details">
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3l12 12M15 3L3 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <p class="eyebrow mono" id="panel-eyebrow"></p>
+      <h2 id="panel-h"></h2>
+      <p class="lede" id="panel-lede"></p>
+      <ul class="list list--check" id="panel-list"></ul>
+      <p class="note" id="panel-note"></p>
+      <div class="ctas">
+        <a class="btn" href="#contact" id="panel-cta">Book a fit check</a>
+        <button type="button" class="btn btn--ghost" id="panel-next"></button>
+      </div>
+      <nav class="panel__tabs" aria-label="Platforms">
+        <button type="button" class="chip" data-tab="0">Web</button>
+        <button type="button" class="chip" data-tab="1">iPhone</button>
+        <button type="button" class="chip" data-tab="2">Android</button>
+      </nav>
+    </div>
+  </dialog>
+
+  <footer class="foot">
+    <a class="loop" href="#top" id="loop" data-scramble-hover>Back to the start ↺</a>
+    <p class="mono small">© 2026 AppContinuity · appcontinuity.com</p>
+    <p class="small muted">RevenueCat, Stripe, Supabase, Apple, App Store, Google Play and Android are trademarks of their respective owners. AppContinuity is an independent service and is not affiliated with them.</p>
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

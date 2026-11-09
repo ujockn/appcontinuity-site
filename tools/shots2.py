@@ -1,0 +1,81 @@
+from playwright.sync_api import sync_playwright
+ARGS = ["--no-sandbox", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"]
+URL = "http://localhost:4173/?debug"
+logs = []
+def hook(pg, tag):
+    pg.on("pageerror", lambda e: logs.append(f"[{tag} pageerror] {e}"))
+    pg.on("console", lambda m: logs.append(f"[{tag} {m.type}] {m.text}") if m.type in ("error","warning") else None)
+with sync_playwright() as p:
+    b = p.chromium.launch(executable_path="/usr/bin/google-chrome", args=ARGS)
+    pg = b.new_page(viewport={"width":1440,"height":900}); hook(pg, "desk")
+    pg.goto(URL, wait_until="networkidle"); pg.wait_for_timeout(4000)
+    c = pg.evaluate("window.__appc.coreScreen()")
+    print("core at", c)
+    pg.click("#sound")
+    pg.mouse.move(c["x"], c["y"]); pg.mouse.down()
+    for k in range(1, 16):
+        pg.mouse.move(c["x"] - 14*k, c["y"] + 9*k); pg.wait_for_timeout(30)
+    pg.wait_for_timeout(500)
+    print("dragging:", pg.evaluate("window.__appc.dragging"), "stretch:", round(pg.evaluate("window.__appc.stretch"),2))
+    pg.screenshot(path="shots/desktop-core-drag.png")
+    pg.mouse.up(); pg.wait_for_timeout(160)
+    pg.screenshot(path="shots/desktop-core-release.png")
+    pg.wait_for_timeout(1500)
+    print("after release stretch:", round(pg.evaluate("window.__appc.stretch"),3))
+    # simple click still pulses (no panel)
+    c = pg.evaluate("window.__appc.coreScreen()")
+    pg.mouse.click(c["x"], c["y"]); pg.wait_for_timeout(300)
+    print("panel open after core click:", pg.evaluate("document.querySelector('#panel').open"))
+    pg.wait_for_timeout(1200)
+    # panels via hero buttons
+    for i, name in enumerate(["web","iphone","android"]):
+        btn = pg.locator(f".switch [data-open='{i}']")
+        btn.focus(); pg.keyboard.press("Enter"); pg.wait_for_timeout(2800)
+        print(name, "open:", pg.evaluate("document.querySelector('#panel').open"), "focus:", pg.evaluate("document.activeElement.id"))
+        pg.screenshot(path=f"shots/desktop-panel-{name}.png")
+        pg.keyboard.press("Escape"); pg.wait_for_timeout(1800)
+        print("  closed:", not pg.evaluate("document.querySelector('#panel').open"), "focus back:", pg.evaluate("document.activeElement.dataset.open"))
+    # click platform shape in 3D opens panel; click outside closes
+    s = pg.evaluate("window.__appc.platformScreen(1)")
+    pg.mouse.click(s["x"], s["y"]); pg.wait_for_timeout(2500)
+    print("shape click opens:", pg.evaluate("document.querySelector('#panel').open"), pg.text_content("#panel-h"))
+    # tab trap
+    for _ in range(12): pg.keyboard.press("Tab")
+    print("focus inside dialog after tabs:", pg.evaluate("document.querySelector('#panel').contains(document.activeElement)"))
+    pg.mouse.click(1300, 120); pg.wait_for_timeout(1500)
+    print("click outside closes:", not pg.evaluate("document.querySelector('#panel').open"))
+    pg.close()
+    # mobile
+    m = b.new_context(viewport={"width":390,"height":844}, device_scale_factor=2, is_mobile=True, has_touch=True)
+    pm = m.new_page(); hook(pm, "mob")
+    pm.goto(URL, wait_until="networkidle"); pm.wait_for_timeout(4000)
+    c = pm.evaluate("window.__appc.coreScreen()")
+    cdp = m.new_cdp_session(pm)
+    def touch(t, x, y):
+        cdp.send("Input.dispatchTouchEvent", {"type": t, "touchPoints": [] if t=="touchEnd" else [{"x": x, "y": y}]})
+    y0 = pm.evaluate("scrollY")
+    touch("touchStart", c["x"], c["y"])
+    for k in range(1, 12): touch("touchMove", c["x"] + 8*k, c["y"] + 10*k); pm.wait_for_timeout(30)
+    pm.wait_for_timeout(300)
+    print("mobile dragging:", pm.evaluate("window.__appc.dragging"), "scroll moved:", pm.evaluate("scrollY") - y0)
+    pm.screenshot(path="shots/mobile-core-drag.png")
+    touch("touchEnd", 0, 0); pm.wait_for_timeout(1500)
+    # touch elsewhere should scroll normally
+    touch("touchStart", 200, 700)
+    for k in range(1, 10): touch("touchMove", 200, 700 - 30*k); pm.wait_for_timeout(20)
+    touch("touchEnd", 0, 0); pm.wait_for_timeout(800)
+    print("mobile non-core swipe scrolled by:", pm.evaluate("scrollY") - y0)
+    pm.evaluate("scrollTo(0,0)"); pm.wait_for_timeout(1500)
+    pm.tap(".switch [data-open='1']"); pm.wait_for_timeout(3000)
+    pm.screenshot(path="shots/mobile-panel-iphone.png")
+    print("mobile panel open:", pm.evaluate("document.querySelector('#panel').open"))
+    m.close()
+    # reduced motion: panel without fly-in
+    r = b.new_context(viewport={"width":1440,"height":900}, reduced_motion="reduce")
+    pr = r.new_page(); hook(pr, "rm")
+    pr.goto(URL, wait_until="networkidle"); pr.wait_for_timeout(1500)
+    pr.click(".switch [data-open='2']"); pr.wait_for_timeout(500)
+    pr.screenshot(path="shots/desktop-reduced-motion-panel.png")
+    print("rm panel open:", pr.evaluate("document.querySelector('#panel').open"))
+    r.close(); b.close()
+print("\n".join(sorted(set(l[:300] for l in logs))) or "no console errors")
