@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 // Optional: set to a form backend URL (Formspree, Basin, a serverless function…)
 // to actually deliver fit-check requests. Empty = show the thank-you state only.
-const FORM_ENDPOINT = 'https://formsubmit.co/ajax/ujockn-86qf0n+fitcheck@mail.grokbot.com';
+const FORM_ENDPOINT = 'https://formsubmit.co/ajax/e3cb54cbdb92c9ac87234141e23f5d1e';
 
 const root = document.documentElement;
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -115,6 +115,7 @@ function start(world) {
       try {
         const r = await fetch(FORM_ENDPOINT, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
         if (!r.ok) throw new Error(r.status);
+        const j = await r.json().catch(() => ({})); if (String(j.success) !== 'true') throw new Error(j.message || 'send failed');
       } catch { err.textContent = 'Something went wrong sending that. Please try again.'; return; }
     }
     $('#thanks-email').textContent = email.value;
