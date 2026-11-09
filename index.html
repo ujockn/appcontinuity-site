@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>RevenueCat integration for Capacitor — AppContinuity</title>
-  <meta name="description" content="Fixed-scope RevenueCat integration for React/Capacitor apps with Supabase and Stripe. Paid access stays the same on web, iPhone and Android." />
+  <meta name="description" content="RevenueCat integration for React/Capacitor apps with Supabase and Stripe. Paid access matches on web, iPhone and Android." />
   <link rel="canonical" href="https://appcontinuity.com/" />
   <meta name="theme-color" content="#05070d" />
   <meta name="color-scheme" content="dark" />
@@ -13,13 +13,13 @@
   <meta property="og:site_name" content="AppContinuity" />
   <meta property="og:url" content="https://appcontinuity.com/" />
   <meta property="og:title" content="AppContinuity — one subscription, every platform" />
-  <meta property="og:description" content="Fixed-scope RevenueCat integration for React/Capacitor apps with Supabase and Stripe. Paid access stays the same on web, iPhone and Android." />
+  <meta property="og:description" content="RevenueCat integration for React/Capacitor apps with Supabase and Stripe. Paid access matches on web, iPhone and Android." />
   <meta property="og:image" content="https://appcontinuity.com/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="AppContinuity — one subscription, every platform" />
-  <meta name="twitter:description" content="Fixed-scope RevenueCat integration for React/Capacitor apps with Supabase and Stripe. Paid access stays the same on web, iPhone and Android." />
+  <meta name="twitter:description" content="RevenueCat integration for React/Capacitor apps with Supabase and Stripe. Paid access matches on web, iPhone and Android." />
   <meta name="twitter:image" content="https://appcontinuity.com/og.png" />
 
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -30,11 +30,11 @@
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "ProfessionalService",
+    "@type": "Organization",
     "name": "AppContinuity",
     "url": "https://appcontinuity.com/",
-    "description": "Fixed-scope RevenueCat subscription integration and acceptance testing for React/Capacitor apps with Supabase login and Stripe web subscriptions.",
-    "serviceType": "Subscription integration and acceptance testing"
+    "email": "contact@appcontinuity.com",
+    "description": "RevenueCat integration and acceptance testing for React/Capacitor apps with Supabase login and Stripe web subscriptions."
   }
   </script>
 </head>
@@ -225,7 +225,7 @@
         <form class="form reveal" id="fit-form" novalidate>
           <input type="hidden" name="_subject" value="New AppContinuity fit check request" />
           <input type="hidden" name="_template" value="table" />
-          <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
+          <input type="text" name="_honey" id="f-honey" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this field empty" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
           <div class="field">
             <label for="f-name">Name</label>
             <input id="f-name" name="name" type="text" autocomplete="name" required />
@@ -263,13 +263,13 @@
         <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 3l12 12M15 3L3 15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       </button>
       <p class="eyebrow mono" id="panel-eyebrow"></p>
-      <h2 id="panel-h"></h2>
+      <h2 id="panel-h">Platform details</h2>
       <p class="lede" id="panel-lede"></p>
       <ul class="list list--check" id="panel-list"></ul>
       <p class="note" id="panel-note"></p>
       <div class="ctas">
         <a class="btn" href="#contact" id="panel-cta">Book a fit check</a>
-        <button type="button" class="btn btn--ghost" id="panel-next"></button>
+        <button type="button" class="btn btn--ghost" id="panel-next" aria-label="Next platform">Next platform</button>
       </div>
       <nav class="panel__tabs" aria-label="Platforms">
         <button type="button" class="chip" data-tab="0">Web</button>

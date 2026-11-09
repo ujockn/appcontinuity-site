@@ -173,8 +173,10 @@ function start(world) {
     $('#panel-list').replaceChildren(...d.items.map((t) => Object.assign(document.createElement('li'), { textContent: t })));
     $('#panel-note').innerHTML = d.note;
     const n = (i + 1) % 3;
-    $('#panel-next').textContent = `Next: ${PLATFORMS[n].name} →`;
-    $('#panel-next').dataset.to = n;
+    const next = $('#panel-next');
+    next.textContent = `Next: ${PLATFORMS[n].name} →`;
+    next.setAttribute('aria-label', `Next: ${PLATFORMS[n].name}`);
+    next.dataset.to = n;
     $$('[data-tab]', panel).forEach((b) => b.setAttribute('aria-current', String(+b.dataset.tab === i)));
     if (swap && !reduced) { panel.classList.remove('is-swap'); void panel.offsetWidth; panel.classList.add('is-swap'); }
     world?.focus(i);
