@@ -2,6 +2,8 @@
 
 Marketing site for AppContinuity. Vite + vanilla JS + Three.js + GSAP ScrollTrigger.
 
+Deploys to [appcontinuity.com](https://appcontinuity.com) via GitHub Pages.
+
 - `npm install`
 - `npm run dev`: local dev server
 - `npm run build`: production build to `dist/` (static files, no server needed)
