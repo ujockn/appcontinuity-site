@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Refunds, transfers, and webhooks — AppContinuity</title>
-  <meta name="description" content="After a refund, cancel, or transfer, which RevenueCat webhook should update paid access — and why you re-fetch the subscriber, not trust the event name." />
+  <meta name="description" content="Which RevenueCat webhook should update paid access after a refund or transfer, and why you re-fetch the subscriber." />
   <link rel="canonical" href="https://appcontinuity.com/articles/refunds-transfers-and-which-webhook-updates-access/" />
   <meta name="theme-color" content="#05070d" />
   <meta name="color-scheme" content="dark" />
@@ -13,7 +13,7 @@
   <meta property="og:site_name" content="AppContinuity" />
   <meta property="og:url" content="https://appcontinuity.com/articles/refunds-transfers-and-which-webhook-updates-access/" />
   <meta property="og:title" content="Refunds, transfers, and webhooks — AppContinuity" />
-  <meta property="og:description" content="After a refund, cancel, or transfer, which RevenueCat webhook should update paid access — and why you re-fetch the subscriber, not trust the event name." />
+  <meta property="og:description" content="Which RevenueCat webhook should update paid access after a refund or transfer, and why you re-fetch the subscriber." />
   <meta property="og:image" content="https://appcontinuity.com/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
@@ -21,7 +21,7 @@
   <meta property="article:author" content="AppContinuity" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Refunds, transfers, and webhooks — AppContinuity" />
-  <meta name="twitter:description" content="After a refund, cancel, or transfer, which RevenueCat webhook should update paid access — and why you re-fetch the subscriber, not trust the event name." />
+  <meta name="twitter:description" content="Which RevenueCat webhook should update paid access after a refund or transfer, and why you re-fetch the subscriber." />
   <meta name="twitter:image" content="https://appcontinuity.com/og.png" />
 
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -34,7 +34,7 @@
     "@context": "https://schema.org",
     "@type": "Article",
     "headline": "Refunds, transfers, and which webhook actually updates access",
-    "description": "After a refund, cancel, or transfer, which RevenueCat webhook should update paid access — and why you re-fetch the subscriber, not trust the event name.",
+    "description": "Which RevenueCat webhook should update paid access after a refund or transfer, and why you re-fetch the subscriber.",
     "datePublished": "2026-11-10",
     "dateModified": "2026-11-10",
     "author": {
@@ -113,6 +113,7 @@
         <p>Use this as a working map for an entitlement-gated Capacitor app. Always confirm against current <a href="https://www.revenuecat.com/docs/integrations/webhooks/event-types-and-fields">RevenueCat event types and fields</a> — names are stable, but fields evolve. There is <strong>no <code>REFUND</code> event type</strong> in current webhooks. Refunds arrive as <code>CANCELLATION</code>.</p>
         <div class="table-wrap">
           <table>
+            <caption>Which RevenueCat webhook should change the Supabase entitlement row</caption>
             <thead>
               <tr>
                 <th scope="col">Situation</th>
@@ -122,52 +123,52 @@
             </thead>
             <tbody>
               <tr>
-                <td>First store or RevenueCat-tracked purchase</td>
+                <th scope="row">First store or RevenueCat-tracked purchase</th>
                 <td><code>INITIAL_PURCHASE</code> (sometimes <code>NON_RENEWING_PURCHASE</code> for lifetime or promo)</td>
                 <td>Mark entitled <strong>after</strong> <code>GET /subscribers</code> shows the entitlement active for that app user id</td>
               </tr>
               <tr>
-                <td>Subscription continued</td>
+                <th scope="row">Subscription continued</th>
                 <td><code>RENEWAL</code></td>
                 <td>Refresh expiration / still entitled</td>
               </tr>
               <tr>
-                <td>User canceled but the period is not over</td>
+                <th scope="row">User canceled but the period is not over</th>
                 <td><code>CANCELLATION</code> with <code>cancel_reason</code> such as <code>UNSUBSCRIBE</code></td>
                 <td>Store “won’t renew”; do <strong>not</strong> revoke early. Access stays until <code>EXPIRATION</code></td>
               </tr>
               <tr>
-                <td>Refund or revoke</td>
+                <th scope="row">Refund or revoke</th>
                 <td><code>CANCELLATION</code>, typically with <code>cancel_reason: CUSTOMER_SUPPORT</code>. <code>price</code> may be negative. Fires only when the <strong>latest</strong> subscription period is refunded. App Store only: <code>REFUND_REVERSED</code> if a refund is later reversed</td>
                 <td><strong>Re-fetch, then write what RevenueCat says.</strong> A refund does not always turn auto-renew off, so do not revoke from the event name alone</td>
               </tr>
               <tr>
-                <td>Period ended, or billing failed and any grace period ended</td>
+                <th scope="row">Period ended, or billing failed and any grace period ended</th>
                 <td><code>EXPIRATION</code></td>
                 <td>Revoke the entitlement</td>
               </tr>
               <tr>
-                <td>Charge failed</td>
+                <th scope="row">Charge failed</th>
                 <td><code>BILLING_ISSUE</code> (often paired with <code>CANCELLATION</code> / <code>cancel_reason=BILLING_ERROR</code>)</td>
                 <td>Do not treat this as expired. Keep access through a grace period if you have one; revoke on <code>EXPIRATION</code></td>
               </tr>
               <tr>
-                <td>Pause (Google Play)</td>
+                <th scope="row">Pause (Google Play)</th>
                 <td><code>SUBSCRIPTION_PAUSED</code> means the pause is <strong>scheduled</strong> for the end of the current period</td>
                 <td>Do <strong>not</strong> revoke on this event. Revoke only on <code>EXPIRATION</code> with <code>expiration_reason: SUBSCRIPTION_PAUSED</code></td>
               </tr>
               <tr>
-                <td>Product change</td>
+                <th scope="row">Product change</th>
                 <td><code>PRODUCT_CHANGE</code></td>
                 <td>Re-read entitlements. A period-end downgrade is not in effect immediately</td>
               </tr>
               <tr>
-                <td>Receipt moved across app user ids</td>
+                <th scope="row">Receipt moved across app user ids</th>
                 <td><code>TRANSFER</code> (one delivery, for the destination user, with both id lists in the body)</td>
                 <td>Revoke <code>transferred_from</code>, grant <code>transferred_to</code> after <code>GET /subscribers</code> on both</td>
               </tr>
               <tr>
-                <td>Anonymous aliased into a Supabase user</td>
+                <th scope="row">Anonymous aliased into a Supabase user</th>
                 <td>No <code>TRANSFER</code> (and no <code>SUBSCRIBER_ALIAS</code> on new projects)</td>
                 <td>Sync on <code>logIn</code>, and use aliases on any later webhook</td>
               </tr>

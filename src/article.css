@@ -56,6 +56,16 @@
   padding: 12px 14px;
   border-bottom: 1px solid var(--line);
 }
+.prose caption {
+  text-align: left;
+  caption-side: top;
+  padding: 12px 14px 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
 .prose th {
   font-family: var(--font-mono);
   font-size: 11px;
