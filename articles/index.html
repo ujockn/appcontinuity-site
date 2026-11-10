@@ -57,9 +57,14 @@
         <p>These notes are about one stack: a React app wrapped with Capacitor, people signing in with Supabase Auth, subscriptions already selling on the web through Stripe, and in-app purchases going through RevenueCat so iPhone and Android unlock the same access.</p>
         <p>Paid access drifts when each platform answers “is this person paid?” on its own. A customer subscribes on the web and meets a paywall in the iPhone app. An Android subscription lapses, but the web app still unlocks everything. Refunds, restores and account switches each update a different record. That is usually not a missing button on the paywall. It is a Supabase user, a Stripe customer, and a RevenueCat app user ID — sometimes still anonymous — that have not been attached to one entitlement.</p>
         <p>What we write here is the work between those systems: identifying a Supabase user in RevenueCat before you trust entitlements; attaching a Stripe web subscription so it unlocks the Capacitor app; keeping access as a server decision instead of a premium flag on the device; and handling purchase, renewal, cancellation, refund, restore and transfer on one path that is safe to retry.</p>
-        <p>Two articles so far: why a Stripe subscriber hits a Capacitor paywall, and how to map Supabase Auth user IDs to RevenueCat so account switches do not hand premium to the wrong person. We stay on this stack on purpose. Native Swift or Kotlin, Flutter and React Native apps are outside what we cover, and so are rebuilds or a move to new accounts.</p>
+        <p>Three articles so far: why a Stripe subscriber hits a Capacitor paywall; how to map Supabase Auth user IDs to RevenueCat so account switches do not hand premium to the wrong person; and which RevenueCat webhook should update paid access after a refund, cancellation, or transfer. We stay on this stack on purpose. Native Swift or Kotlin, Flutter and React Native apps are outside what we cover, and so are rebuilds or a move to new accounts.</p>
       </div>
       <div class="article-list">
+        <a class="card" href="/articles/refunds-transfers-and-which-webhook-updates-access/">
+          <p class="card__meta">10 November 2026</p>
+          <h2>Refunds, transfers, and which webhook actually updates access</h2>
+          <p>There is no REFUND webhook. Cancellations, refunds, pauses, and transfers each mean something different — and you should re-fetch the RevenueCat subscriber before you change the Supabase row.</p>
+        </a>
         <a class="card" href="/articles/mapping-supabase-auth-to-revenuecat/">
           <p class="card__meta">9 November 2026</p>
           <h2>Mapping Supabase Auth user IDs to RevenueCat without granting the wrong person’s access</h2>

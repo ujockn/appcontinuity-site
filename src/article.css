@@ -34,6 +34,40 @@
 .prose ol li { padding-left: 0.35em; }
 .prose ol li::marker { color: var(--accent); }
 
+.prose .table-wrap {
+  margin: 0 0 1.6em;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--panel);
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.prose th, .prose td {
+  text-align: left;
+  vertical-align: top;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.prose th {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+.prose tr:last-child th, .prose tr:last-child td { border-bottom: 0; }
+.prose td { color: var(--muted); }
+.prose td:first-child { color: var(--ink); }
+
 .article-cta {
   margin-top: 56px;
   padding: 28px 26px;
@@ -117,5 +151,7 @@
   .check-list label { break-inside: avoid; }
   .byline a { color: #111; }
   h1, h2 { break-after: avoid; }
+  .prose table { break-inside: auto; }
+  .prose tr { break-inside: avoid; }
   a[href]::after { content: ""; }
 }

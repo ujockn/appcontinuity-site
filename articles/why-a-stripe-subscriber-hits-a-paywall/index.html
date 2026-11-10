@@ -125,7 +125,7 @@ if (user) {
         <p>We later ran a sandbox purchase end to end on an iPad, through the real store sandbox and RevenueCat, so the purchase, the identified user, and the entitlement could be checked together rather than simulated.</p>
 
         <h2>Refunds, transfers, and the webhook you actually handle</h2>
-        <p>Purchase is only the first event. Refunds, billing-portal cancellations, store transfers, and account switches each update a different record if you treat them as optional cleanup.</p>
+        <p>Purchase is only the first event. Refunds, billing-portal cancellations, store transfers, and account switches each update a different record if you treat them as optional cleanup. The follow-up article is <a href="/articles/refunds-transfers-and-which-webhook-updates-access/">refunds, transfers, and which webhook actually updates access</a>.</p>
         <p>A webhook that only handles the initial purchase will leave a web cancellation or an App Store refund sitting in Stripe or App Store Connect while your Supabase user remains marked premium. A webhook that updates “the latest event’s user” without checking a transfer can move access the wrong way when RevenueCat aliases an anonymous ID onto a custom ID.</p>
         <p>The reconciliation work is unglamorous and necessary: for each event, identify the RevenueCat app user, map that to the Supabase user, write the entitlement that event implies, and make the write idempotent so a retry does not grant twice or revoke the wrong person. We treated refunds, transfers, and replayed webhooks as part of the same problem, not as follow-up tickets.</p>
         <p>That write path also has to survive a crash. If a worker dies after seeing a webhook and before committing the entitlement, the next attempt should finish the same logical event rather than skip it or apply it twice. We exercised abandoned-lease recovery with separate Postgres sessions so one session could take over a lease another session had left behind. We did not independently verify recovery by killing a live OS process, so that remaining case should not be claimed as proven.</p>
@@ -163,7 +163,7 @@ if (user) {
       </div>
       <div class="article-cta">
         <h2>Book a fit check</h2>
-        <p>If this is the drift you are seeing, tell us about your app. If the stack matches, we will email you to confirm scope. Or work through the free <a href="/checklist/">Capacitor + RevenueCat entitlement checklist</a> first. Prices for the Continuity Audit, Integration, and Continuity Care are on the site.</p>
+        <p>If this is the drift you are seeing, tell us about your app. If the stack matches, we will email you to confirm scope. Or work through the free <a href="/checklist/">Capacitor + RevenueCat entitlement checklist</a> first. Related reading: <a href="/articles/refunds-transfers-and-which-webhook-updates-access/">refunds, transfers, and which webhook actually updates access</a>. Prices for the Continuity Audit, Integration, and Continuity Care are on the site.</p>
         <div class="ctas">
           <a class="btn" href="/#contact">Book a fit check</a>
           <a class="btn btn--ghost" href="/checklist/">Open the checklist</a>

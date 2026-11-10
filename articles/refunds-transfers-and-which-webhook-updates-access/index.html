@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Refunds, transfers, and webhooks — AppContinuity</title>
+  <meta name="description" content="After a refund, cancel, or transfer, which RevenueCat webhook should update paid access — and why you re-fetch the subscriber, not trust the event name." />
+  <link rel="canonical" href="https://appcontinuity.com/articles/refunds-transfers-and-which-webhook-updates-access/" />
+  <meta name="theme-color" content="#05070d" />
+  <meta name="color-scheme" content="dark" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="AppContinuity" />
+  <meta property="og:url" content="https://appcontinuity.com/articles/refunds-transfers-and-which-webhook-updates-access/" />
+  <meta property="og:title" content="Refunds, transfers, and webhooks — AppContinuity" />
+  <meta property="og:description" content="After a refund, cancel, or transfer, which RevenueCat webhook should update paid access — and why you re-fetch the subscriber, not trust the event name." />
+  <meta property="og:image" content="https://appcontinuity.com/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-11-10" />
+  <meta property="article:author" content="AppContinuity" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Refunds, transfers, and webhooks — AppContinuity" />
+  <meta name="twitter:description" content="After a refund, cancel, or transfer, which RevenueCat webhook should update paid access — and why you re-fetch the subscriber, not trust the event name." />
+  <meta name="twitter:image" content="https://appcontinuity.com/og.png" />
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Refunds, transfers, and which webhook actually updates access",
+    "description": "After a refund, cancel, or transfer, which RevenueCat webhook should update paid access — and why you re-fetch the subscriber, not trust the event name.",
+    "datePublished": "2026-11-10",
+    "dateModified": "2026-11-10",
+    "author": {
+      "@type": "Organization",
+      "name": "AppContinuity",
+      "url": "https://appcontinuity.com/about/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AppContinuity",
+      "url": "https://appcontinuity.com/"
+    },
+    "mainEntityOfPage": "https://appcontinuity.com/articles/refunds-transfers-and-which-webhook-updates-access/",
+    "url": "https://appcontinuity.com/articles/refunds-transfers-and-which-webhook-updates-access/",
+    "image": "https://appcontinuity.com/og.png"
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top">
+    <a class="brand" href="/" aria-label="AppContinuity, home">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".45"/><circle cx="16" cy="16" r="4.2" fill="#7cf2d0"/><circle cx="16" cy="5" r="2" fill="currentColor"/><circle cx="25.5" cy="21.5" r="2" fill="currentColor"/><circle cx="6.5" cy="21.5" r="2" fill="currentColor"/></svg>
+      <span>AppContinuity</span>
+    </a>
+    <nav class="nav" aria-label="Site">
+      <a href="/#problem">Problem</a>
+      <a href="/#scope">Scope</a>
+      <a href="/#process">Process</a>
+      <a href="/#fit">Fit</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/articles/" aria-current="page">Articles</a>
+      <a href="/checklist/">Checklist</a>
+      <a href="/about/">About</a>
+      <a href="/#contact-us">Contact</a>
+    </nav>
+    <div class="top__actions">
+      <a class="btn btn--small" href="/#contact">Book a fit check</a>
+    </div>
+  </header>
+  <main id="main" class="article-main">
+    <article class="article">
+      <p class="eyebrow mono"><a href="/articles/">Articles</a></p>
+      <h1>Refunds, transfers, and which webhook actually updates access</h1>
+      <p class="byline"><a href="/about/">AppContinuity, solo developer</a> · Published 10 November 2026</p>
+      <div class="prose">
+        <p>Official RevenueCat docs already list every webhook event type. This piece is about the exact stack — React + Capacitor, Supabase Auth, Stripe on the web, RevenueCat on iPhone and Android — and the narrow question founders hit after the first successful purchase: <strong>which event should change “is this person paid?” in your database</strong>, especially when money moves backward (a refund) or sideways (a transfer or alias).</p>
+        <p>It follows <a href="/articles/why-a-stripe-subscriber-hits-a-paywall/">why a Stripe subscriber hits a Capacitor paywall</a> and <a href="/articles/mapping-supabase-auth-to-revenuecat/">mapping Supabase Auth user IDs to RevenueCat</a>. Those cover attaching the web subscription and identifying the signed-in user. This one is the webhook file you write after that.</p>
+
+        <h2>The failure mode</h2>
+        <p>You handled <code>INITIAL_PURCHASE</code> and maybe <code>RENEWAL</code>. Production looks fine for a week. Then one of these shows up:</p>
+        <ul class="list list--check">
+          <li>A customer is refunded through Apple, Google, or Stripe. Your admin UI still says premium.</li>
+          <li>User A buys on a phone. User B logs into the same phone and suddenly has premium. Or A loses it without a cancellation email.</li>
+          <li>Someone buys while anonymous, then creates a Supabase account. Your webhook log is quiet. Support asks why the new user id has no row.</li>
+          <li>A Stripe subscription is canceled in the Customer Portal. RevenueCat still shows an active entitlement until the period ends — or, if the Stripe attach is missing, it never updates at all.</li>
+        </ul>
+        <p>Each case is a different event (or a non-event). Treating “any webhook → set paid=true” is how access drifts.</p>
+
+        <h2>One entitlement, three writers</h2>
+        <p>On this stack, three systems can honestly disagree for a few seconds:</p>
+        <ol>
+          <li><strong>Store / Stripe</strong> — Apple, Google, or Stripe’s own subscription state.</li>
+          <li><strong>RevenueCat</strong> — <code>CustomerInfo</code> / <code>GET /subscribers</code> for an App User ID.</li>
+          <li><strong>Your Supabase row</strong> — whatever you wrote last from a webhook or a client flag.</li>
+        </ol>
+        <p>AppContinuity’s rule: <strong>(3) may only change because of (2), and (2) is refreshed after the webhook, not guessed from the event name alone.</strong> RevenueCat’s own webhook guide says the same thing: call <code>GET /subscribers</code> after receiving any webhook, because event payloads are not a uniform snapshot. The Capacitor app reads entitlements for UX; the API trusts the server row (or a server-side RevenueCat check), never a client boolean.</p>
+
+        <h2>Alias vs transfer (why your TRANSFER handler never runs)</h2>
+        <p>Two different identity moves get confused constantly.</p>
+        <p><strong>Alias (anonymous → <code>logIn(customId)</code>).</strong> Purchase on <code>$RCAnonymousID:…</code>, then <code>Purchases.logIn({ appUserID: supabaseUser.id })</code>. RevenueCat merges those ids onto <strong>one customer</strong>. You will <strong>not</strong> get a <code>TRANSFER</code> webhook. Both ids appear as aliases on the same subscriber. New projects also will not get the legacy <code>SUBSCRIBER_ALIAS</code> event — that type is deprecated. If your backend only inserts rows keyed by the custom id when it sees <code>INITIAL_PURCHASE</code>, the anonymous purchase already fired that event under the anonymous id. After <code>logIn</code>, sync from the app to your API and run <code>GET /subscribers</code>, and resolve aliases on every later webhook.</p>
+        <p><strong>Transfer (receipt moves between customers).</strong> Typical case: restore (or certain login paths) while project restore behavior is “Transfer to new App User ID.” RevenueCat sends <code>TRANSFER</code> with <code>transferred_from</code> and <code>transferred_to</code>. Current docs are explicit: the webhook is delivered only for the destination user, the event body is identical, and it still lists both sides. There is <strong>no</strong> separate <code>EXPIRATION</code> for the loser and <code>RENEWAL</code> for the winner in that moment. Handle <code>TRANSFER</code> itself, then re-fetch subscriber state for every id in <code>transferred_from</code> and <code>transferred_to</code>.</p>
+        <p>If you require Supabase login before purchase and you do not want shared-phone entitlement theft, set restore behavior to <strong>Keep with original App User ID</strong> and teach support / <code>RECEIPT_ALREADY_IN_USE</code>. That choice belongs next to your Auth wiring, not only in a webhook file.</p>
+
+        <h2>Which webhook should flip access</h2>
+        <p>Use this as a working map for an entitlement-gated Capacitor app. Always confirm against current <a href="https://www.revenuecat.com/docs/integrations/webhooks/event-types-and-fields">RevenueCat event types and fields</a> — names are stable, but fields evolve. There is <strong>no <code>REFUND</code> event type</strong> in current webhooks. Refunds arrive as <code>CANCELLATION</code>.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Situation</th>
+                <th scope="col">Event(s) you must handle</th>
+                <th scope="col">What to write in Supabase</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>First store or RevenueCat-tracked purchase</td>
+                <td><code>INITIAL_PURCHASE</code> (sometimes <code>NON_RENEWING_PURCHASE</code> for lifetime or promo)</td>
+                <td>Mark entitled <strong>after</strong> <code>GET /subscribers</code> shows the entitlement active for that app user id</td>
+              </tr>
+              <tr>
+                <td>Subscription continued</td>
+                <td><code>RENEWAL</code></td>
+                <td>Refresh expiration / still entitled</td>
+              </tr>
+              <tr>
+                <td>User canceled but the period is not over</td>
+                <td><code>CANCELLATION</code> with <code>cancel_reason</code> such as <code>UNSUBSCRIBE</code></td>
+                <td>Store “won’t renew”; do <strong>not</strong> revoke early. Access stays until <code>EXPIRATION</code></td>
+              </tr>
+              <tr>
+                <td>Refund or revoke</td>
+                <td><code>CANCELLATION</code>, typically with <code>cancel_reason: CUSTOMER_SUPPORT</code>. <code>price</code> may be negative. Fires only when the <strong>latest</strong> subscription period is refunded. App Store only: <code>REFUND_REVERSED</code> if a refund is later reversed</td>
+                <td><strong>Re-fetch, then write what RevenueCat says.</strong> A refund does not always turn auto-renew off, so do not revoke from the event name alone</td>
+              </tr>
+              <tr>
+                <td>Period ended, or billing failed and any grace period ended</td>
+                <td><code>EXPIRATION</code></td>
+                <td>Revoke the entitlement</td>
+              </tr>
+              <tr>
+                <td>Charge failed</td>
+                <td><code>BILLING_ISSUE</code> (often paired with <code>CANCELLATION</code> / <code>cancel_reason=BILLING_ERROR</code>)</td>
+                <td>Do not treat this as expired. Keep access through a grace period if you have one; revoke on <code>EXPIRATION</code></td>
+              </tr>
+              <tr>
+                <td>Pause (Google Play)</td>
+                <td><code>SUBSCRIPTION_PAUSED</code> means the pause is <strong>scheduled</strong> for the end of the current period</td>
+                <td>Do <strong>not</strong> revoke on this event. Revoke only on <code>EXPIRATION</code> with <code>expiration_reason: SUBSCRIPTION_PAUSED</code></td>
+              </tr>
+              <tr>
+                <td>Product change</td>
+                <td><code>PRODUCT_CHANGE</code></td>
+                <td>Re-read entitlements. A period-end downgrade is not in effect immediately</td>
+              </tr>
+              <tr>
+                <td>Receipt moved across app user ids</td>
+                <td><code>TRANSFER</code> (one delivery, for the destination user, with both id lists in the body)</td>
+                <td>Revoke <code>transferred_from</code>, grant <code>transferred_to</code> after <code>GET /subscribers</code> on both</td>
+              </tr>
+              <tr>
+                <td>Anonymous aliased into a Supabase user</td>
+                <td>No <code>TRANSFER</code> (and no <code>SUBSCRIBER_ALIAS</code> on new projects)</td>
+                <td>Sync on <code>logIn</code>, and use aliases on any later webhook</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p><strong>Stripe-specific:</strong> attaching a web subscription is not a StoreKit restore. Your server sends the Stripe subscription to RevenueCat (<code>POST /receipts</code> / track external purchases) with the <strong>same</strong> <code>app_user_id</code> you use in <code>Purchases.logIn</code>. Stripe’s own webhooks update <em>your</em> billing tables; <strong>RevenueCat</strong> still needs the attach (and then RevenueCat webhooks / subscriber reads) before the Capacitor app should unlock. A Customer Portal cancel should show up as <code>CANCELLATION</code> (usually <code>UNSUBSCRIBE</code>) and, at period end, <code>EXPIRATION</code>. A Stripe or RevenueCat Billing refund is the <code>CUSTOMER_SUPPORT</code> cancellation path. If a portal cancel never appears in RevenueCat, you have an integration gap, not a Capacitor bug.</p>
+
+        <h2>Recommended handler shape</h2>
+        <p>Pseudo-flow that survives retries:</p>
+        <pre><code>on webhook(event):
+  verify authorization header (and HMAC signature if enabled)
+  idempotency_key = event.id   # retries reuse the same id
+  ids = affected_app_user_ids(event)  # transferred_from/to and aliases when present
+  for id in ids:
+    subscriber = GET /v1/subscribers/{id}
+    entitled = entitlement_active(subscriber, "your_entitlement_id")
+    upsert supabase entitlements for supabase_user = map_rc_id_to_supabase(id, subscriber.aliases)
+         set entitled, source_event=event.type, checked_at=now()
+  return 200 quickly</code></pre>
+        <p>Notes that prevent support tickets:</p>
+        <ul class="list list--check">
+          <li><strong>Idempotency:</strong> RevenueCat retries, and retries reuse the same <code>event.id</code> and <code>event_timestamp_ms</code>. Processing <code>INITIAL_PURCHASE</code> twice must not double-grant side effects (emails, credits).</li>
+          <li><strong>Re-fetch:</strong> Event payloads differ by type. <code>GET /subscribers</code> makes every handler the same shape (<a href="https://www.revenuecat.com/docs/integrations/webhooks">webhooks overview</a>).</li>
+          <li><strong>Alias map:</strong> Store every alias you see so anonymous ids and custom ids resolve to one Supabase user. Search both <code>original_app_user_id</code> and <code>aliases</code>.</li>
+          <li><strong>Client cache:</strong> Capacitor <code>CustomerInfo</code> can look premium offline for a grace period; <code>logOut</code> clears it. UX can use cache; your API should not.</li>
+        </ul>
+
+        <h2>Refunds without theater</h2>
+        <p>A refund is not “set a flag from the App Store email.” Sequence that works:</p>
+        <ol>
+          <li>The store or Stripe reports a refund. RevenueCat records it as <code>CANCELLATION</code> (typically <code>CUSTOMER_SUPPORT</code>) when it is the latest period — not as a <code>REFUND</code> event, and not for refunds of earlier periods.</li>
+          <li>Your handler re-fetches subscriber state. If the entitlement is gone, clear it for the mapped Supabase user. If auto-renew is still on, keep what RevenueCat reports.</li>
+          <li>The next app launch (or customer-info listener) shows the paywall.</li>
+        </ol>
+        <p>If you only listen to Stripe <code>charge.refunded</code> and forget RevenueCat, the iPhone build can stay unlocked until a stale cache dies. If you only listen to RevenueCat and never reconcile Stripe seats, your web app drifts the other way. Same entitlement id on both paths.</p>
+
+        <h2>Sandbox cases that prove the webhook file</h2>
+        <p>Before you trust production (a mirror of the Integration acceptance suite):</p>
+        <ol>
+          <li>Purchase → row entitled.</li>
+          <li>Refund (sandbox) → row revoked without reinstalling, once RevenueCat shows the entitlement gone.</li>
+          <li>Anonymous purchase → <code>logIn(supabase id)</code> → <strong>no</strong> <code>TRANSFER</code>, but the server row exists for the Supabase user after your sync.</li>
+          <li>User A entitled → <code>logOut</code> → User B login → B not entitled (with keep-with-original, or after you handle <code>TRANSFER</code> correctly).</li>
+          <li>Stripe attach for user A → Capacitor for A unlocks; B does not.</li>
+          <li>Replay the same webhook delivery twice → one idempotent write.</li>
+        </ol>
+        <p>A printable list of these cases: <a href="/checklist/">the free entitlement checklist</a>.</p>
+
+        <h2>Short checklist</h2>
+        <ul class="list list--check">
+          <li>Decide restore behavior before you write webhook code.</li>
+          <li>Handle <code>TRANSFER</code> explicitly; do not expect a paired expiration and renewal. Update both id lists from the one destination delivery.</li>
+          <li>Do not expect <code>TRANSFER</code> (or <code>SUBSCRIBER_ALIAS</code>) on an anonymous alias; sync on <code>logIn</code>.</li>
+          <li>After every webhook, <code>GET /subscribers</code> and write entitlements from that.</li>
+          <li>Idempotent on <code>event.id</code>.</li>
+          <li>Map aliases to one Supabase user.</li>
+          <li>There is no <code>REFUND</code> webhook; refunds arrive as <code>CANCELLATION</code>. Revoke when RevenueCat says the entitlement is gone, on web and mobile together.</li>
+          <li>Do not revoke on <code>SUBSCRIPTION_PAUSED</code> or on a normal cancel before <code>EXPIRATION</code>.</li>
+          <li>Stripe cancel and attach are part of the same entitlement story, not a second premium boolean.</li>
+        </ul>
+
+        <h2>Sources</h2>
+        <ul class="list list--check">
+          <li>RevenueCat webhooks: <a href="https://www.revenuecat.com/docs/integrations/webhooks">https://www.revenuecat.com/docs/integrations/webhooks</a></li>
+          <li>RevenueCat event types and fields (including cancellation reasons): <a href="https://www.revenuecat.com/docs/integrations/webhooks/event-types-and-fields">https://www.revenuecat.com/docs/integrations/webhooks/event-types-and-fields</a></li>
+          <li>RevenueCat common webhook flows: <a href="https://www.revenuecat.com/docs/integrations/webhooks/event-flows">https://www.revenuecat.com/docs/integrations/webhooks/event-flows</a></li>
+          <li>RevenueCat restore behavior: <a href="https://www.revenuecat.com/docs/projects/restore-behavior">https://www.revenuecat.com/docs/projects/restore-behavior</a></li>
+          <li>RevenueCat identifying customers: <a href="https://www.revenuecat.com/docs/customers/identifying-customers">https://www.revenuecat.com/docs/customers/identifying-customers</a></li>
+          <li>RevenueCat Stripe external purchases: <a href="https://www.revenuecat.com/docs/web/integrations/stripe/track-external-purchases">https://www.revenuecat.com/docs/web/integrations/stripe/track-external-purchases</a></li>
+          <li>RevenueCat Stripe server notifications: <a href="https://www.revenuecat.com/docs/platform-resources/server-notifications/stripe-server-notifications">https://www.revenuecat.com/docs/platform-resources/server-notifications/stripe-server-notifications</a></li>
+        </ul>
+      </div>
+      <div class="article-cta">
+        <h2>Book a fit check</h2>
+        <p>If refunds or shared-device transfers are already wrong in production, start with the free <a href="/checklist/">entitlement checklist</a>, or <a href="/#contact">book a fit check</a> if you want the Integration done on this stack. Related reading: <a href="/articles/mapping-supabase-auth-to-revenuecat/">mapping Supabase Auth user IDs to RevenueCat</a> and <a href="/articles/why-a-stripe-subscriber-hits-a-paywall/">why a Stripe subscriber hits a Capacitor paywall</a>.</p>
+        <div class="ctas">
+          <a class="btn" href="/#contact">Book a fit check</a>
+          <a class="btn btn--ghost" href="/checklist/">Open the checklist</a>
+        </div>
+      </div>
+    </article>
+  </main>
+  <footer class="foot">
+    <a class="loop" href="/">Back to AppContinuity</a>
+    <p class="mono small">© 2026 AppContinuity · <a href="/about/">About</a> · <a href="/privacy/">Privacy</a> · <a href="/checklist/">Checklist</a> · <a href="/articles/">Articles</a> · <a href="mailto:contact@appcontinuity.com">contact@appcontinuity.com</a></p>
+    <p class="small muted">RevenueCat, Stripe, Supabase, Apple, App Store, Google Play and Android are trademarks of their respective owners. AppContinuity is an independent service and is not affiliated with them.</p>
+  </footer>
+  <script type="module" src="/src/article.js"></script>
+</body>
+</html>
