@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Sandbox and Play test purchases — AppContinuity</title>
+  <meta name="description" content="How to test Capacitor + RevenueCat subscriptions on a real iPhone or iPad in App Store sandbox, and on Android in Play internal testing." />
+  <link rel="canonical" href="https://appcontinuity.com/articles/testing-subscriptions-in-sandbox-and-play-internal/" />
+  <meta name="theme-color" content="#05070d" />
+  <meta name="color-scheme" content="dark" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="AppContinuity" />
+  <meta property="og:url" content="https://appcontinuity.com/articles/testing-subscriptions-in-sandbox-and-play-internal/" />
+  <meta property="og:title" content="Sandbox and Play test purchases — AppContinuity" />
+  <meta property="og:description" content="How to test Capacitor + RevenueCat subscriptions on a real iPhone or iPad in App Store sandbox, and on Android in Play internal testing." />
+  <meta property="og:image" content="https://appcontinuity.com/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="article:published_time" content="2026-11-11" />
+  <meta property="article:author" content="AppContinuity" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Sandbox and Play test purchases — AppContinuity" />
+  <meta name="twitter:description" content="How to test Capacitor + RevenueCat subscriptions on a real iPhone or iPad in App Store sandbox, and on Android in Play internal testing." />
+  <meta name="twitter:image" content="https://appcontinuity.com/og.png" />
+
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Testing subscriptions end to end in App Store sandbox and Play internal testing",
+    "description": "How to test Capacitor + RevenueCat subscriptions on a real iPhone or iPad in App Store sandbox, and on Android in Play internal testing.",
+    "datePublished": "2026-11-11",
+    "dateModified": "2026-11-11",
+    "author": {
+      "@type": "Organization",
+      "name": "AppContinuity",
+      "url": "https://appcontinuity.com/about/"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "AppContinuity",
+      "url": "https://appcontinuity.com/"
+    },
+    "mainEntityOfPage": "https://appcontinuity.com/articles/testing-subscriptions-in-sandbox-and-play-internal/",
+    "url": "https://appcontinuity.com/articles/testing-subscriptions-in-sandbox-and-play-internal/",
+    "image": "https://appcontinuity.com/og.png"
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="top">
+    <a class="brand" href="/" aria-label="AppContinuity, home">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="1.6" opacity=".45"/><circle cx="16" cy="16" r="4.2" fill="#7cf2d0"/><circle cx="16" cy="5" r="2" fill="currentColor"/><circle cx="25.5" cy="21.5" r="2" fill="currentColor"/><circle cx="6.5" cy="21.5" r="2" fill="currentColor"/></svg>
+      <span>AppContinuity</span>
+    </a>
+    <nav class="nav" aria-label="Site">
+      <a href="/#problem">Problem</a>
+      <a href="/#scope">Scope</a>
+      <a href="/#process">Process</a>
+      <a href="/#fit">Fit</a>
+      <a href="/#pricing">Pricing</a>
+      <a href="/articles/" aria-current="page">Articles</a>
+      <a href="/checklist/">Checklist</a>
+      <a href="/about/">About</a>
+      <a href="/#contact-us">Contact</a>
+    </nav>
+    <div class="top__actions">
+      <a class="btn btn--small" href="/#contact">Book a fit check</a>
+    </div>
+  </header>
+  <main id="main" class="article-main">
+    <article class="article">
+      <p class="eyebrow mono"><a href="/articles/">Articles</a></p>
+      <h1>Testing subscriptions end to end in App Store sandbox and Play internal testing</h1>
+      <p class="byline"><a href="/about/">AppContinuity, solo developer</a> · Published 11 November 2026</p>
+      <div class="prose">
+        <p>Official Apple, Google, and RevenueCat docs already cover sandbox testers and renewal timers. This piece is about the exact stack — React + Capacitor, Supabase Auth, Stripe on the web, RevenueCat on iPhone and Android — and the test founders skip after the first successful <code>purchase()</code> call: proving the store path on a real device, watching an accelerated renewal, and confirming the same App User ID in the RevenueCat dashboard before you trust production.</p>
+        <p>It follows <a href="/articles/why-a-stripe-subscriber-hits-a-paywall/">why a Stripe subscriber hits a Capacitor paywall</a>, <a href="/articles/mapping-supabase-auth-to-revenuecat/">mapping Supabase Auth user IDs to RevenueCat</a>, and <a href="/articles/refunds-transfers-and-which-webhook-updates-access/">refunds, transfers, and which webhook actually updates access</a>. Those cover attaching the web subscription, identifying the signed-in user, and the webhook file. This one is the device session that proves those pieces still agree after a real store purchase.</p>
+
+        <h2>The failure mode</h2>
+        <p>You bought a monthly product in RevenueCat’s Test Store, or in the iOS Simulator with a StoreKit configuration file, and the paywall unlocked. That is useful during development. It is not the same as a store purchase:</p>
+        <ul class="list list--check">
+          <li>Test Store never talks to App Store or Play Billing. Shipping with the Test Store API key means production purchases will not be tracked.</li>
+          <li>StoreKit Testing in Xcode is a local environment. RevenueCat documents that cancel and refund actions you trigger there are not stored in the receipt and will not appear in the dashboard, even if the SDK later drops the entitlement after a restart.</li>
+          <li>TestFlight uses a production Apple Account and sandbox purchases, but Apple currently renews every TestFlight subscription once per day, up to six times in a week, regardless of duration. That is the wrong clock if you want to watch a monthly renewal in the next five minutes.</li>
+          <li>A Play internal test track purchase will charge a real payment method unless that Google account is also a license tester. Google is explicit: testers incur actual charges on a test track unless they are license testers.</li>
+          <li>The Capacitor app can show “entitlement active” from cached <code>CustomerInfo</code> while RevenueCat never received the receipt — or received it under an anonymous App User ID instead of your Supabase <code>user.id</code>.</li>
+        </ul>
+        <p>Each of those can look like a passing test. None of them is the pre-launch check.</p>
+
+        <h2>What this test is</h2>
+        <p>Use the platform sandbox, on a physical device, with the platform RevenueCat API keys (Apple and Google), after <code>Purchases.logIn</code> with the Supabase Auth user id. RevenueCat detects sandbox versus production automatically; you do not flip a project setting to “test mode.” You do turn on <strong>View Sandbox Data</strong> in the dashboard, or the transaction will look missing.</p>
+        <p>The goal is narrow: initiate a purchase, complete it, confirm the entitlement unlocks in the app, then confirm the same customer in RevenueCat. After that, wait through at least one accelerated renewal and, if your webhook file is already in place, confirm the server row still matches.</p>
+
+        <h2>App Store sandbox on a real iPhone or iPad</h2>
+        <p>Create a Sandbox Apple Account in App Store Connect under Users and Access → Sandbox. Use an email address that is not already an Apple Account. Enable Developer Mode on the device. Sign in with that sandbox account in the sandbox slot, not as the device’s personal Apple Account:</p>
+        <ul class="list list--check">
+          <li>On current iOS, Settings → Developer → Sandbox Apple Account.</li>
+          <li>On earlier iOS, Settings → App Store → Sandbox Account.</li>
+        </ul>
+        <p>If the field is missing, start a purchase in a development-signed build; Apple will prompt, and the sandbox account then appears in Settings. You do not sign out of your personal Apple Account to buy in sandbox.</p>
+        <p>Install a development-signed Capacitor iOS build — not an App Store production build, and not a TestFlight build if you want the minutes-scale renewal schedule. Apple’s sandbox can be slow; RevenueCat notes that a sandbox purchase may take upwards of 15 seconds. That is normal. In production, the same flow is usually a few seconds.</p>
+        <p>By default, a sandbox account uses a speed of <strong>1 month = 5 minutes</strong>. You can change that rate per tester in App Store Connect or in the on-device sandbox settings. Subscriptions automatically renew up to 12 times, and auto-renewal turns off on the thirteenth renewal attempt. After that you can test expiration and a lapse without waiting a real month.</p>
+        <div class="table-wrap">
+          <table>
+            <caption>Default App Store sandbox renewal speed (1 month = 5 minutes)</caption>
+            <thead>
+              <tr>
+                <th scope="col">Production duration</th>
+                <th scope="col">Sandbox renewal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">1 week</th>
+                <td>3 minutes</td>
+              </tr>
+              <tr>
+                <th scope="row">1 month</th>
+                <td>5 minutes</td>
+              </tr>
+              <tr>
+                <th scope="row">2 months</th>
+                <td>10 minutes</td>
+              </tr>
+              <tr>
+                <th scope="row">3 months</th>
+                <td>15 minutes</td>
+              </tr>
+              <tr>
+                <th scope="row">6 months</th>
+                <td>30 minutes</td>
+              </tr>
+              <tr>
+                <th scope="row">1 year</th>
+                <td>1 hour</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Treat store metadata in sandbox as untrustworthy. Prices and currencies in <code>getOfferings()</code> are often wrong here and in TestFlight, even when the purchase sheet is right and the buy succeeds. Test the flow, not the label.</p>
+        <p>We ran this path on a real iPad with a development-signed Capacitor build and a Sandbox Apple Account. Before the buy, the monthly Pro product loaded a store price and the <code>pro</code> entitlement was not active. After the buy, the app showed the entitlement active and marked the purchase as sandbox. The on-device card only reported whether the entitlement was active — not the expiration — so the five-minute renewals were not something you could watch in the UI alone. That is a useful design constraint: if your paywall only prints “pro is active,” you still have to open RevenueCat (and your webhook log) to prove renewals. A missing URL for our own API did not block the store entitlement from becoming active. That is expected, and it is also the trap: a device flag is not proof that the Supabase row updated.</p>
+
+        <h2>Play internal testing, plus license testers</h2>
+        <p>Google’s test has two lists, and founders often complete only one.</p>
+        <ol>
+          <li><strong>License testers</strong> — in Play Console, under license testing. License testers get test payment methods (“always approves,” “always declines,” and slower cards) and the accelerated renewal schedule. Google also lets license testers sideload a build whose package name matches the Play app. Your publishing account is already a license tester. Changes can take a while to propagate.</li>
+          <li><strong>A testing track</strong> — Google recommends publishing the app to a test track and having each tester open the opt-in URL. Internal testing is the usual first track for a new Capacitor app. A closed track also works; RevenueCat’s own walkthrough uses one. Products and subscriptions must be published before you can buy them. The package name of the build must match the Play application id. After you publish to a track, the release can take a few hours to become available.</li>
+        </ol>
+        <p>Both matter. RevenueCat’s matrix is blunt: a tester who opted into the track but is not a license tester is offered a real card. Google says the same: users incur actual charges for test-track purchases unless they are license testers. Draft apps and internal-test releases also have spend limits.</p>
+        <p>While you are testing, use one Google account on the device — the license tester that opted in. RevenueCat warns that multiple accounts on the device are a sandbox-only source of failed purchases. Google notes that if several accounts are present, the purchase is made with the account that downloaded the app. If products do not load, the usual causes are a skipped opt-in URL, a mismatched application id, or a release that is not available in the tester’s country yet. Some devices also need a PIN before subscriptions will complete.</p>
+        <p>Play test subscriptions renew faster than production, and they renew a maximum of six times (not counting free trials and introductory periods). Times are approximate; Google tells you to re-read subscription state after each expected expiration.</p>
+        <div class="table-wrap">
+          <table>
+            <caption>Google Play license-tester subscription renewal periods</caption>
+            <thead>
+              <tr>
+                <th scope="col">Production period</th>
+                <th scope="col">Test renewal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">1 week</th>
+                <td>5 minutes</td>
+              </tr>
+              <tr>
+                <th scope="row">1 month</th>
+                <td>5 minutes</td>
+              </tr>
+              <tr>
+                <th scope="row">3 months</th>
+                <td>10 minutes</td>
+              </tr>
+              <tr>
+                <th scope="row">6 months</th>
+                <td>15 minutes</td>
+              </tr>
+              <tr>
+                <th scope="row">1 year</th>
+                <td>30 minutes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>A personal Play developer account must still complete identity checks, and public production has a closed-testing requirement (a group of testers for a stretch of days) before you can sell to everyone. That rule is about launching, not about whether an internal test purchase can go through. You can — and should — run license-tester purchases on an internal track before that production gate.</p>
+
+        <h2>What to verify in RevenueCat</h2>
+        <p>After a successful purchase, the transaction should appear immediately in the dashboard. If it does not, RevenueCat is not tracking it. Before you conclude that, turn on <strong>View Sandbox Data</strong>. There is no separate “sandbox customer” in RevenueCat; the same App User ID can hold sandbox and production receipts, and the toggle only changes which purchases the overview shows.</p>
+        <p>Check, in order:</p>
+        <ul class="list list--check">
+          <li>The App User ID is the Supabase Auth <code>user.id</code> you passed to <code>Purchases.logIn</code>, not a still-anonymous <code>$RCAnonymousID</code>. If it is anonymous, the buy worked for this install and will drift the first time someone signs in — the subject of the <a href="/articles/mapping-supabase-auth-to-revenuecat/">mapping article</a>.</li>
+          <li>The purchase is marked sandbox, from App Store or Play, for the product you bought.</li>
+          <li>The entitlement you gate on is active, with an expiration consistent with the accelerated period (about five minutes for a monthly product on the default Apple rate, or on Play).</li>
+          <li>After a renewal window: the entitlement is still active. RevenueCat and Apple both warn that, because renewals are so fast, not every renewal is guaranteed to show in the customer dashboard. If you have webhooks, look for <code>RENEWAL</code> in the event log as well.</li>
+          <li>After you cancel in the device subscription settings: you should see <code>CANCELLATION</code>, but access should remain until <code>EXPIRATION</code> at the end of the current (short) period — the same rule as production, described in the <a href="/articles/refunds-transfers-and-which-webhook-updates-access/">webhooks article</a>.</li>
+          <li>After Apple’s twelfth renewal, or Play’s sixth, auto-renew stops. The next expiry should drop the entitlement in the app and in RevenueCat, and your Supabase row should follow if the webhook handler re-fetches the subscriber.</li>
+        </ul>
+        <p>Do not use this session as a metadata test. Do not treat a deleted RevenueCat customer as a fresh store buyer: deleting the customer removes RevenueCat’s copy of the receipts, not the App Store or Play purchase history. Restoring will bring those purchases back. To reuse an Apple sandbox tester, clear that tester’s purchase history in App Store Connect. RevenueCat also caps App Store subscription receipts on one customer at 100, which is easy to hit in sandbox and will not happen in production; deleting the RevenueCat customer clears the cap.</p>
+
+        <h2>A sequence that actually proves the path</h2>
+        <p>Run this on iOS first, then the same checks on a real Android device.</p>
+        <ol>
+          <li>Sign in to the Capacitor app with Supabase Auth. Call <code>Purchases.logIn</code> with <code>user.id</code> before you show the paywall.</li>
+          <li>Confirm offerings load from the store (a price appears). Do not fail the test because the currency looks wrong in sandbox.</li>
+          <li>Buy the monthly product. Wait through a slow Apple sandbox sheet if needed.</li>
+          <li>In the app, the entitlement is active.</li>
+          <li>In RevenueCat, with sandbox data visible, the same App User ID has a sandbox transaction and an active entitlement.</li>
+          <li>Wait one renewal period. Confirm the entitlement is still active, and that a renewal appears in the dashboard or the webhook log.</li>
+          <li>Cancel from the device subscription settings. Confirm <code>CANCELLATION</code> and that access remains until the short period ends.</li>
+          <li>After expiration — or after the last automatic renewal — the entitlement is gone in the app, in RevenueCat, and in the Supabase row.</li>
+          <li>Restore as the same user and confirm the current state (active or expired) comes back under the same App User ID.</li>
+          <li>Sign out, sign in as a second Supabase user on the same device, and confirm that user does not inherit premium.</li>
+        </ol>
+        <p>If step 4 passes and step 5 fails, the store worked and RevenueCat did not see the receipt — usually the wrong API key, or a purchase that never reached the SDK. If step 5 shows an anonymous id, fix identity before you debug webhooks. If the device is entitled and RevenueCat is entitled but Supabase is not, the webhook file is the gap, not Capacitor.</p>
+        <p>A printable list of these cases lives on the <a href="/checklist/">free entitlement checklist</a>.</p>
+
+        <h2>Short checklist</h2>
+        <ul class="list list--check">
+          <li>Use platform API keys, not the Test Store key, for this test.</li>
+          <li>Identify the Supabase user before the purchase.</li>
+          <li>Test on a real device: Sandbox Apple Account in the sandbox slot for iOS; license tester plus test-track opt-in for Android.</li>
+          <li>Do not use TestFlight when you need five-minute monthly renewals; TestFlight currently renews once a day, up to six times.</li>
+          <li>On Play, being on the internal track is not enough to avoid a real charge. Add the same account as a license tester.</li>
+          <li>Turn on View Sandbox Data and confirm the transaction, the App User ID, the entitlement, and a renewal — not only a device flag.</li>
+          <li>Cancel does not revoke early. Expiration does.</li>
+          <li>Clearing a RevenueCat customer does not clear App Store or Play history.</li>
+          <li>Stripe web attach is a different path; this test does not replace it. See <a href="/articles/why-a-stripe-subscriber-hits-a-paywall/">why a Stripe subscriber hits a paywall</a>.</li>
+        </ul>
+
+        <h2>Sources</h2>
+        <ul class="list list--check">
+          <li>Apple, overview of testing in sandbox: <a href="https://developer.apple.com/help/app-store-connect/test-in-app-purchases/overview-of-testing-in-sandbox/">https://developer.apple.com/help/app-store-connect/test-in-app-purchases/overview-of-testing-in-sandbox/</a></li>
+          <li>Apple, create a Sandbox Apple Account: <a href="https://developer.apple.com/help/app-store-connect/test-in-app-purchases/create-a-sandbox-apple-account/">https://developer.apple.com/help/app-store-connect/test-in-app-purchases/create-a-sandbox-apple-account/</a></li>
+          <li>Apple, manage Sandbox Apple Account settings (renewal rates): <a href="https://developer.apple.com/help/app-store-connect/test-in-app-purchases/manage-sandbox-apple-account-settings/">https://developer.apple.com/help/app-store-connect/test-in-app-purchases/manage-sandbox-apple-account-settings/</a></li>
+          <li>Apple, testing an auto-renewable subscription: <a href="https://developer.apple.com/documentation/storekit/testing-an-auto-renewable-subscription">https://developer.apple.com/documentation/storekit/testing-an-auto-renewable-subscription</a></li>
+          <li>Apple, testing subscriptions in TestFlight: <a href="https://developer.apple.com/help/app-store-connect/test-a-beta-version/testing-subscriptions-and-in-app-purchases-in-testflight/">https://developer.apple.com/help/app-store-connect/test-a-beta-version/testing-subscriptions-and-in-app-purchases-in-testflight/</a></li>
+          <li>RevenueCat sandbox testing: <a href="https://www.revenuecat.com/docs/test-and-launch/sandbox">https://www.revenuecat.com/docs/test-and-launch/sandbox</a></li>
+          <li>RevenueCat Apple App Store and TestFlight: <a href="https://www.revenuecat.com/docs/test-and-launch/sandbox/apple-app-store">https://www.revenuecat.com/docs/test-and-launch/sandbox/apple-app-store</a></li>
+          <li>RevenueCat Google Play Store: <a href="https://www.revenuecat.com/docs/test-and-launch/sandbox/google-play-store">https://www.revenuecat.com/docs/test-and-launch/sandbox/google-play-store</a></li>
+          <li>Google, test Play Billing: <a href="https://developer.android.com/google/play/billing/test">https://developer.android.com/google/play/billing/test</a></li>
+          <li>Google, license testers: <a href="https://support.google.com/googleplay/android-developer/answer/6062777">https://support.google.com/googleplay/android-developer/answer/6062777</a></li>
+        </ul>
+      </div>
+      <div class="article-cta">
+        <h2>Book a fit check</h2>
+        <p>If sandbox purchases already disagree between the device, RevenueCat, and your Supabase row, start with the free <a href="/checklist/">entitlement checklist</a>, or <a href="/#contact">book a fit check</a> if you want the Integration done on this stack. Related reading: <a href="/articles/refunds-transfers-and-which-webhook-updates-access/">refunds, transfers, and which webhook actually updates access</a>, <a href="/articles/mapping-supabase-auth-to-revenuecat/">mapping Supabase Auth user IDs to RevenueCat</a>, and <a href="/articles/why-a-stripe-subscriber-hits-a-paywall/">why a Stripe subscriber hits a Capacitor paywall</a>.</p>
+        <div class="ctas">
+          <a class="btn" href="/#contact">Book a fit check</a>
+          <a class="btn btn--ghost" href="/checklist/">Open the checklist</a>
+        </div>
+      </div>
+    </article>
+  </main>
+  <footer class="foot">
+    <a class="loop" href="/">Back to AppContinuity</a>
+    <p class="mono small">© 2026 AppContinuity · <a href="/about/">About</a> · <a href="/privacy/">Privacy</a> · <a href="/checklist/">Checklist</a> · <a href="/articles/">Articles</a> · <a href="mailto:contact@appcontinuity.com">contact@appcontinuity.com</a></p>
+    <p class="small muted">RevenueCat, Stripe, Supabase, Apple, App Store, Google Play and Android are trademarks of their respective owners. AppContinuity is an independent service and is not affiliated with them.</p>
+  </footer>
+  <script type="module" src="/src/article.js"></script>
+</body>
+</html>
