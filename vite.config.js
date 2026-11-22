@@ -17,6 +17,7 @@ export default defineConfig({
         mapping: resolve(dir, 'articles/mapping-supabase-auth-to-revenuecat/index.html'),
         refunds: resolve(dir, 'articles/refunds-transfers-and-which-webhook-updates-access/index.html'),
         sandbox: resolve(dir, 'articles/testing-subscriptions-in-sandbox-and-play-internal/index.html'),
+        playreview: resolve(dir, 'articles/play-review-item-could-not-be-found/index.html'),
         about: resolve(dir, 'about/index.html'),
         privacy: resolve(dir, 'privacy/index.html'),
         checklist: resolve(dir, 'checklist/index.html'),
