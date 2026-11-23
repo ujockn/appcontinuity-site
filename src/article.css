@@ -189,3 +189,12 @@
 .checklist-signup .thanks p { margin: 0 0 0.7em; }
 .checklist-signup .thanks p:last-child { margin-bottom: 0; }
 .checklist-signup .thanks a { color: var(--accent); }
+
+.checklist-meta { margin: 0 0 0; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.checklist-start { margin: 22px 0 1.6em; padding: 16px 18px; border-left: 2px solid var(--accent); background: var(--panel); border-radius: 0 12px 12px 0; }
+.checklist-start strong { color: var(--ink); }
+.checklist-start a, .inline-cta a { color: var(--accent); }
+.inline-cta { margin: 0 0 2em; padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); color: var(--ink); }
+.prose .inline-cta { color: var(--ink); }
+.article-cta + .prose .checklist-signup { margin-top: 40px; }
+#checklist-next, #checklist-signup { scroll-margin-top: 96px; }

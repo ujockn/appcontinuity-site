@@ -104,48 +104,13 @@
       <h1>Capacitor + RevenueCat + Stripe entitlement checklist</h1>
       <p class="byline"><a href="/about/">AppContinuity, solo developer</a> · Published 9 November 2026 · Updated 22 November 2026 · Free · No email required</p>
       <div class="prose">
-        <p>Use this when a React app wrapped with Capacitor already signs people in with Supabase Auth and sells subscriptions on the web through Stripe — and you want App Store and Play purchases to unlock the <em>same</em> paid access. Tick what you have verified. Print it or download the PDF if that helps. Nothing here is gated.</p>
+        <p>Use this when a React app wrapped with Capacitor already signs people in with Supabase Auth and sells subscriptions on the web through Stripe, and you want App Store and Play purchases to unlock the <em>same</em> paid access. Tick each item once you have verified it in your own project.</p>
+        <p class="checklist-meta mono">40 checks · 7 sections · about 45 minutes</p>
         <p class="checklist-tools no-print">
           <a class="btn btn--small" href="/checklist/capacitor-revenuecat-stripe-entitlement-checklist.pdf">Download the PDF</a>
           <button type="button" class="btn btn--ghost btn--small" id="print-checklist">Print this page</button>
         </p>
-
-        <section class="checklist-signup no-print" id="checklist-signup" aria-labelledby="checklist-signup-title">
-          <form id="checklist-form" class="form" novalidate>
-            <input type="hidden" name="_subject" value="New AppContinuity checklist signup" />
-            <input type="hidden" name="_template" value="table" />
-            <input type="hidden" name="_cc" value="contact@appcontinuity.com" />
-            <input type="hidden" name="_replyto" id="checklist-replyto" value="" />
-            <input type="hidden" name="request_type" value="checklist-signup" />
-            <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this field empty" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
-            <div class="field field--full">
-              <h2 id="checklist-signup-title" class="signup-title">Optional: email me the PDF</h2>
-              <p class="signup-lede">The HTML checklist and the PDF are free with no email. If you want the PDF sent to you, plus a few short follow-ups about this stack, leave your address.</p>
-            </div>
-            <div class="field">
-              <label for="checklist-name">Name</label>
-              <input id="checklist-name" name="name" type="text" autocomplete="name" required />
-            </div>
-            <div class="field">
-              <label for="checklist-email">Email</label>
-              <input id="checklist-email" name="email" type="email" autocomplete="email" required />
-            </div>
-            <div class="field field--full">
-              <label class="check" for="checklist-consent">
-                <input id="checklist-consent" name="consent" type="checkbox" value="yes" required />
-                <span>I want the PDF emailed to me and short follow-up emails about this checklist. I can stop anytime by replying “stop.” See <a href="/privacy/">Privacy</a>.</span>
-              </label>
-            </div>
-            <p class="form__err" id="checklist-form-err" role="status"></p>
-            <button type="submit" class="btn">Email me the PDF</button>
-            <p class="form__note">You can also <a href="/checklist/capacitor-revenuecat-stripe-entitlement-checklist.pdf">download the PDF now</a> with no signup.</p>
-          </form>
-          <div id="checklist-thanks" class="thanks" hidden tabindex="-1">
-            <h3>Thanks — here is the PDF</h3>
-            <p>Download it now. This does not depend on email: <a href="/checklist/capacitor-revenuecat-stripe-entitlement-checklist.pdf">Capacitor + RevenueCat + Stripe entitlement checklist (PDF)</a>.</p>
-            <p>The same items stay on this page. Short follow-up notes, if you asked for them, will come from <a href="mailto:contact@appcontinuity.com">contact@appcontinuity.com</a> to <span id="checklist-thanks-email">your email</span> once that sequence is on. You can reply “stop” anytime.</p>
-          </div>
-        </section>
+        <p class="checklist-start"><strong>Short on time?</strong> Start with sections 1 and 2. A Supabase user who is not identified in RevenueCat, or a Stripe subscription attached to a different customer, is the usual reason a paying web customer meets a paywall in the iPhone or Android app. <a class="no-print" href="#checklist-next">Already seeing that? Skip to the next step.</a></p>
 
         <h2>1. App user IDs and aliasing with Supabase Auth</h2>
         <ul class="check-list">
@@ -168,6 +133,7 @@
           <li><label><input type="checkbox" /> <span>After a web subscribe, <code>CustomerInfo</code> in the Capacitor app shows the expected active entitlement for that signed-in user without a separate “also check Stripe from the phone” path.</span></label></li>
         </ul>
         <p class="note-inline">Official references: <a href="https://www.revenuecat.com/docs/web/integrations/stripe/track-external-purchases">Track External Purchases</a>, <a href="https://www.revenuecat.com/docs/platform-resources/server-notifications/stripe-server-notifications">Stripe Server Notifications</a>.</p>
+        <p class="inline-cta no-print">Sections 1 and 2 mostly empty, and paying customers already locked out? <a href="/#contact">Book a free fit check</a>. Tell us where access drifts and we reply by email within 1–2 business days.</p>
 
         <h2>3. Entitlement naming and client gates</h2>
         <ul class="check-list">
@@ -221,17 +187,55 @@
         </ul>
         <p class="note-inline">Official references: <a href="https://www.revenuecat.com/docs/test-and-launch/debugging/caching">Caching</a>, <a href="https://www.revenuecat.com/docs/customers/customer-info">CustomerInfo</a>.</p>
 
-        <h2>If several boxes stay empty</h2>
-        <p>That usually means identity, Stripe attachment, or webhook reconciliation — not a missing paywall button. The article <a href="/articles/why-a-stripe-subscriber-hits-a-paywall/">Why a Stripe subscriber hits a paywall in your Capacitor iPhone app</a> walks through the most common failure. If you want the messy middle done for you on this stack, the next step is a free fit check.</p>
+        <h2 id="checklist-next">If several boxes stay empty</h2>
+        <p>That usually points to identity, Stripe attachment, or webhook reconciliation rather than a missing paywall button. The article <a href="/articles/why-a-stripe-subscriber-hits-a-paywall/">Why a Stripe subscriber hits a paywall in your Capacitor iPhone app</a> walks through the most common failure. If you want the messy middle done for you on this stack, the next step is a free fit check.</p>
       </div>
       <div class="article-cta no-print">
-        <h2>Book a fit check</h2>
-        <p>If paid access already drifts between web and the Capacitor app, tell us where. If the stack matches, we will email you to confirm scope. This checklist stays free either way.</p>
+        <h2>Book a free fit check</h2>
+        <p>Tell us where paid access drifts between Stripe on the web and the Capacitor app. We reply within 1–2 business days. If the stack matches, we confirm scope in writing. If it does not, we say so. This checklist stays free either way.</p>
         <div class="ctas">
-          <a class="btn" href="/#contact">Book a fit check</a>
-          <a class="btn btn--ghost" href="/checklist/capacitor-revenuecat-stripe-entitlement-checklist.pdf">Download the PDF</a>
+          <a class="btn" href="/#contact">Book a free fit check</a>
           <a class="btn btn--ghost" href="/#pricing">See pricing</a>
         </div>
+      </div>
+      <div class="prose">
+        <section class="checklist-signup no-print" id="checklist-signup" aria-labelledby="checklist-signup-title">
+          <form id="checklist-form" class="form" novalidate>
+            <input type="hidden" name="_subject" value="New AppContinuity checklist signup" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="_cc" value="contact@appcontinuity.com" />
+            <input type="hidden" name="_replyto" id="checklist-replyto" value="" />
+            <input type="hidden" name="request_type" value="checklist-signup" />
+            <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this field empty" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
+            <div class="field field--full">
+              <h2 id="checklist-signup-title" class="signup-title">Optional: get the PDF link and two follow-ups by email</h2>
+              <p class="signup-lede">Not needed for the checklist or the PDF. Leave your address if you want the PDF link in your inbox, then two short notes: one on why a Stripe subscriber can still hit a Capacitor paywall, and one on the free fit check. That is the whole sequence.</p>
+            </div>
+            <div class="field">
+              <label for="checklist-name">Name</label>
+              <input id="checklist-name" name="name" type="text" autocomplete="name" required />
+            </div>
+            <div class="field">
+              <label for="checklist-email">Email</label>
+              <input id="checklist-email" name="email" type="email" autocomplete="email" required />
+            </div>
+            <div class="field field--full">
+              <label class="check" for="checklist-consent">
+                <input id="checklist-consent" name="consent" type="checkbox" value="yes" required />
+                <span>Email me the PDF link and up to two short follow-ups about this checklist. I can stop anytime by replying “stop.” See <a href="/privacy/">Privacy</a>.</span>
+              </label>
+            </div>
+            <p class="form__err" id="checklist-form-err" role="status"></p>
+            <button type="submit" class="btn">Send me the follow-ups</button>
+            <p class="form__note">Two fields, used only to send these emails. The <a href="/checklist/capacitor-revenuecat-stripe-entitlement-checklist.pdf">PDF downloads now</a> with no signup.</p>
+          </form>
+          <div id="checklist-thanks" class="thanks" hidden tabindex="-1">
+            <h3>Thanks — here is the PDF</h3>
+            <p>Download it now. This does not depend on email: <a href="/checklist/capacitor-revenuecat-stripe-entitlement-checklist.pdf">Capacitor + RevenueCat + Stripe entitlement checklist (PDF)</a>.</p>
+            <p>The same items stay on this page. The PDF link and two short follow-ups will come from <a href="mailto:contact@appcontinuity.com">contact@appcontinuity.com</a> to <span id="checklist-thanks-email">your email</span> once that sequence is on. You can reply “stop” anytime.</p>
+            <p>If paid access already drifts between Stripe and the app, the quicker route is a <a href="/#contact">free fit check</a>. We reply within 1–2 business days.</p>
+          </div>
+        </section>
       </div>
     </article>
   </main>
