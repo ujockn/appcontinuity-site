@@ -122,7 +122,7 @@
         <span class="sound__bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
         <span class="sound__txt mono" aria-hidden="true">Sound off</span>
       </button>
-      <a class="btn btn--small" href="#contact" data-scramble-hover>Book a fit check</a>
+      <a class="btn btn--small" href="#contact" data-fit-cta data-scramble-hover>Book a fit check</a>
     </div>
   </header>
 
@@ -133,7 +133,7 @@
         <h1 class="reveal" data-scramble>One subscription.<br />Every platform.<br /><span class="accent">Same answer.</span></h1>
         <p class="lede reveal">RevenueCat integration and acceptance testing for founders with an existing React/Capacitor app, Supabase login and Stripe web subscriptions. You keep your code and your accounts. Paid access behaves the same on web, iPhone and Android.</p>
         <div class="ctas reveal">
-          <a class="btn" href="#contact" data-scramble-hover>Book a fit check</a>
+          <a class="btn" href="#contact" data-fit-cta data-scramble-hover>Book a fit check</a>
           <a class="btn btn--ghost" href="#scope" data-scramble-hover>See the scope</a>
         </div>
         <div class="switch reveal" role="group" aria-labelledby="switch-l">
@@ -256,22 +256,28 @@
           <li>Sandbox acceptance guarantee: if the agreed sandbox acceptance tests do not pass because of our work, we keep working at no extra fee or refund the remaining 50%. This does not cover App Store or Play approval, production purchases, or work outside the written scope.</li>
           <li>Only one Integration is taken at a time, so each project gets focused attention.</li>
         </ul>
+        <p class="note reveal" id="founding-spots">3 founding spots at $4,900. 3 left.</p>
         <p class="note reveal">Integration covers the three deliverables above. It does not include a rebuild, a new backend, or a move to new accounts. Prefer to check yourself first? Use the free <a href="/checklist/">Capacitor + RevenueCat entitlement checklist</a>.</p>
         <div class="ctas reveal">
-          <a class="btn" href="#contact" data-scramble-hover>Book a fit check</a>
+          <a class="btn" href="#contact" data-fit-cta data-scramble-hover>Book a fit check</a>
           <a class="btn btn--ghost" href="mailto:contact@appcontinuity.com" data-scramble-hover>Email us</a>
         </div>
       </div>
     </section>
 
     <section class="sec cta" id="contact" data-sec="6" aria-labelledby="contact-h">
-      <div class="col">
+      <div class="col col--contact">
         <p class="eyebrow mono reveal">06 — Next step</p>
         <h2 id="contact-h" class="reveal" data-scramble>Book a fit check.</h2>
-        <p class="lede reveal">Tell us about your app. If the stack matches, we’ll email you to confirm scope.</p>
+        <p class="lede reveal" id="contact-lede">Tell us about your app. We’ll reply within 1–2 business days about whether the stack matches, and if it does, to confirm scope.</p>
+        <div class="contact-grid">
+          <div>
         <form class="form reveal" id="fit-form" novalidate>
-          <input type="hidden" name="_subject" value="New AppContinuity fit check request" />
+          <input type="hidden" name="_subject" id="f-subject" value="New AppContinuity fit check request" />
           <input type="hidden" name="_template" value="table" />
+          <input type="hidden" name="_cc" value="contact@appcontinuity.com" />
+          <input type="hidden" name="_replyto" id="f-replyto" value="" />
+          <input type="hidden" name="request_type" id="f-request-type" value="fit-check" />
           <input type="text" name="_honey" id="f-honey" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this field empty" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
           <div class="field">
             <label for="f-name">Name</label>
@@ -281,6 +287,13 @@
             <label for="f-email">Email</label>
             <input id="f-email" name="email" type="email" autocomplete="email" required />
           </div>
+          <fieldset class="field field--full stack">
+            <legend>Does this match your stack?</legend>
+            <p class="opt">Check all that apply. You can still submit if some are unchecked.</p>
+            <label class="check"><input type="checkbox" name="stack_capacitor" value="yes" /> React app wrapped with Capacitor</label>
+            <label class="check"><input type="checkbox" name="stack_supabase" value="yes" /> People log in with Supabase Auth</label>
+            <label class="check"><input type="checkbox" name="stack_stripe" value="yes" /> Subscriptions already sell on the web through Stripe</label>
+          </fieldset>
           <div class="field field--full">
             <label for="f-app">App link <span class="opt">(optional)</span></label>
             <input id="f-app" name="app" type="url" inputmode="url" placeholder="https://" />
@@ -290,11 +303,37 @@
             <textarea id="f-msg" name="message" rows="4"></textarea>
           </div>
           <p class="form__err" id="form-err" role="alert"></p>
-          <button class="btn" type="submit" data-scramble-hover>Send</button>
+          <p class="form__note">We reply within 1–2 business days. <a href="/privacy/">Privacy</a></p>
+          <button class="btn" type="submit" id="fit-submit" data-scramble-hover>Book a fit check</button>
         </form>
         <div class="thanks" id="thanks" hidden tabindex="-1">
-          <h3>Thanks — got it.</h3>
-          <p>We’ll reply to <span id="thanks-email">your email</span> about next steps.</p>
+          <h3 id="thanks-title">Thanks — got it.</h3>
+          <p id="thanks-body">We’ll reply to <span id="thanks-email">your email</span> within 1–2 business days about whether the stack matches. Meanwhile, the entitlement checklist is free to use: <a href="/checklist/">appcontinuity.com/checklist</a>.</p>
+        </div>
+          </div>
+          <aside class="faq reveal" aria-labelledby="faq-h">
+            <h3 id="faq-h">Common questions</h3>
+            <details>
+              <summary>How quickly will you reply?</summary>
+              <p>Within 1–2 business days, with a short email about whether the stack matches. The fit check is free and is not a call.</p>
+            </details>
+            <details>
+              <summary>What access do you need?</summary>
+              <p>None for the fit check. If we later agree to an Audit or Integration, we use temporary repository and dashboard access you grant and can revoke. Your RevenueCat, Stripe, Supabase, and store accounts stay yours.</p>
+            </details>
+            <details>
+              <summary>Is acceptance a live store purchase?</summary>
+              <p>No. Acceptance is a sandbox test suite we run with you. App Store or Play approval is not included and is not guaranteed.</p>
+            </details>
+            <details>
+              <summary>What is not included?</summary>
+              <p>Rebuilds, new backends, moving you onto new vendor accounts, paywall design, and work on native, Flutter, or React Native apps.</p>
+            </details>
+            <details>
+              <summary>What is the founding price?</summary>
+              <p>For the first three good-fit Integration clients, Integration is $4,900 instead of $6,500, in exchange for a short case study or quote. The remaining count is listed with the prices above.</p>
+            </details>
+          </aside>
         </div>
         <div class="contact-us reveal" id="contact-us">
           <h3>Contact us</h3>
@@ -315,7 +354,7 @@
       <ul class="list list--check" id="panel-list"></ul>
       <p class="note" id="panel-note"></p>
       <div class="ctas">
-        <a class="btn" href="#contact" id="panel-cta">Book a fit check</a>
+        <a class="btn" href="#contact" id="panel-cta" data-fit-cta>Book a fit check</a>
         <button type="button" class="btn btn--ghost" id="panel-next" aria-label="Next platform">Next platform</button>
       </div>
       <nav class="panel__tabs" aria-label="Platforms">

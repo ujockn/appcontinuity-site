@@ -19,3 +19,11 @@ Deploys to [appcontinuity.com](https://appcontinuity.com) via GitHub Pages.
 
 ## Before going live
 - Form: set `FORM_ENDPOINT` in `src/main.js` to a form backend; empty = thank-you state only (nothing is sent).
+
+## Founding spots and waitlist
+
+Public switches live in `src/site-config.js`. Change a value, commit, and push to `main`.
+
+- `foundingSpotsRemaining`: `3`, `2`, `1`, or `0`. The pricing section always says “3 founding spots at $4,900” and then how many are left.
+- `waitlistEnabled`: leave `false` until an Integration is actually booked. When `true`, the fit-check form becomes a waitlist form.
+- `waitlistNextOpening`: a plain date or month (for example `12 January 2027`), shown only when the waitlist is on. No countdowns.

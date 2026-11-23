@@ -6,6 +6,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Sound } from './audio.js';
 import { scramble, prepare } from './scramble.js';
+import { foundingSpotsRemaining, waitlistEnabled, waitlistNextOpening } from './site-config.js';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -61,11 +62,48 @@ async function boot() {
   start(world);
 }
 
+function applySiteConfig() {
+  const remaining = Math.max(0, Math.min(3, Number(foundingSpotsRemaining) || 0));
+  const spots = $('#founding-spots');
+  if (spots) spots.textContent = `3 founding spots at $4,900. ${remaining} left.`;
+
+  const subject = $('#f-subject');
+  const requestType = $('#f-request-type');
+  const heading = $('#contact-h');
+  const lede = $('#contact-lede');
+  const submit = $('#fit-submit');
+  const thanksTitle = $('#thanks-title');
+  const note = document.querySelector('#fit-form .form__note');
+
+  if (!waitlistEnabled) {
+    if (subject) subject.value = 'New AppContinuity fit check request';
+    if (requestType) requestType.value = 'fit-check';
+    return;
+  }
+
+  const opening = String(waitlistNextOpening || '').trim();
+  const ledeText = opening
+    ? `Currently booked, next opening ${opening}. Join the waitlist.`
+    : 'Currently booked. Join the waitlist and we’ll email you when the next opening is set.';
+
+  if (heading) heading.textContent = 'Join the waitlist.';
+  if (lede) lede.textContent = ledeText;
+  if (submit) submit.textContent = 'Join the waitlist';
+  if (subject) subject.value = 'New AppContinuity waitlist request';
+  if (requestType) requestType.value = 'waitlist';
+  if (note) {
+    note.innerHTML = 'We’ll email you when the next opening is available. <a href="/privacy/">Privacy</a>';
+  }
+  if (thanksTitle) thanksTitle.textContent = 'Thanks — you’re on the waitlist.';
+  $$('[data-fit-cta]').forEach((el) => { el.textContent = 'Join the waitlist'; });
+}
+
 function start(world) {
   const sections = $$('[data-sec]');
   const labels = $$('.plabel');
 
   // ---------- reveals + scramble ----------
+  applySiteConfig();
   $$('[data-scramble], [data-scramble-hover]').forEach(prepare);
   if (!reduced) {
     const heroEls = $$('.hero .reveal');
@@ -111,6 +149,8 @@ function start(world) {
     else if (app.value && !app.validity.valid) { msg = 'That app link doesn’t look like a URL.'; app.setAttribute('aria-invalid', 'true'); app.focus(); }
     err.textContent = msg;
     if (msg) { sound.glitch(); return; }
+    const replyTo = $('#f-replyto');
+    if (replyTo) replyTo.value = email.value.trim();
     if (FORM_ENDPOINT) {
       try {
         const r = await fetch(FORM_ENDPOINT, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
@@ -118,7 +158,12 @@ function start(world) {
         const j = await r.json().catch(() => ({})); if (String(j.success) !== 'true') throw new Error(j.message || 'send failed');
       } catch { err.textContent = 'Something went wrong sending that. Please try again.'; return; }
     }
-    $('#thanks-email').textContent = email.value;
+    const thanksEmail = $('#thanks-email');
+    if (thanksEmail) thanksEmail.textContent = email.value;
+    if (waitlistEnabled) {
+      const body = $('#thanks-body');
+      if (body) body.textContent = `We’ll write to ${email.value} when the next opening is available.`;
+    }
     form.hidden = true;
     const th = $('#thanks'); th.hidden = false; th.focus();
     if (!reduced) gsap.fromTo(th, { opacity: 0, filter: 'blur(10px)', y: 16 }, { opacity: 1, filter: 'blur(0px)', y: 0, duration: 0.8, ease: 'power3.out' });
