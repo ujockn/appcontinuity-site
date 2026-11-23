@@ -21,6 +21,7 @@ export default defineConfig({
         about: resolve(dir, 'about/index.html'),
         privacy: resolve(dir, 'privacy/index.html'),
         checklist: resolve(dir, 'checklist/index.html'),
+        unsubscribe: resolve(dir, 'unsubscribe/index.html'),
       },
     },
   },
