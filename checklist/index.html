@@ -36,7 +36,7 @@
     "name": "Capacitor + RevenueCat + Stripe entitlement checklist",
     "description": "A practical checklist to confirm paid access matches across Stripe on the web, iPhone and Android in a React/Capacitor app with Supabase Auth and RevenueCat.",
     "datePublished": "2026-11-09",
-    "dateModified": "2026-11-09",
+    "dateModified": "2026-11-22",
     "author": {
       "@type": "Organization",
       "name": "AppContinuity",
@@ -102,10 +102,50 @@
     <article class="article checklist">
       <p class="eyebrow mono"><a href="/articles/">Articles</a> · Free checklist</p>
       <h1>Capacitor + RevenueCat + Stripe entitlement checklist</h1>
-      <p class="byline"><a href="/about/">AppContinuity, solo developer</a> · Published 9 November 2026 · Free · No email required</p>
+      <p class="byline"><a href="/about/">AppContinuity, solo developer</a> · Published 9 November 2026 · Updated 22 November 2026 · Free · No email required</p>
       <div class="prose">
-        <p>Use this when a React app wrapped with Capacitor already signs people in with Supabase Auth and sells subscriptions on the web through Stripe — and you want App Store and Play purchases to unlock the <em>same</em> paid access. Tick what you have verified. Print it if that helps. Nothing here is gated.</p>
-        <p class="print-hint no-print"><button type="button" class="btn btn--ghost btn--small" id="print-checklist">Print this checklist</button></p>
+        <p>Use this when a React app wrapped with Capacitor already signs people in with Supabase Auth and sells subscriptions on the web through Stripe — and you want App Store and Play purchases to unlock the <em>same</em> paid access. Tick what you have verified. Print it or download the PDF if that helps. Nothing here is gated.</p>
+        <p class="checklist-tools no-print">
+          <a class="btn btn--small" href="/checklist/capacitor-revenuecat-stripe-entitlement-checklist.pdf">Download the PDF</a>
+          <button type="button" class="btn btn--ghost btn--small" id="print-checklist">Print this page</button>
+        </p>
+
+        <section class="checklist-signup no-print" id="checklist-signup" aria-labelledby="checklist-signup-title">
+          <form id="checklist-form" class="form" novalidate>
+            <input type="hidden" name="_subject" value="New AppContinuity checklist signup" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="_cc" value="contact@appcontinuity.com" />
+            <input type="hidden" name="_replyto" id="checklist-replyto" value="" />
+            <input type="hidden" name="request_type" value="checklist-signup" />
+            <input type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" aria-label="Leave this field empty" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" />
+            <div class="field field--full">
+              <h2 id="checklist-signup-title" class="signup-title">Optional: email me the PDF</h2>
+              <p class="signup-lede">The HTML checklist and the PDF are free with no email. If you want the PDF sent to you, plus a few short follow-ups about this stack, leave your address.</p>
+            </div>
+            <div class="field">
+              <label for="checklist-name">Name</label>
+              <input id="checklist-name" name="name" type="text" autocomplete="name" required />
+            </div>
+            <div class="field">
+              <label for="checklist-email">Email</label>
+              <input id="checklist-email" name="email" type="email" autocomplete="email" required />
+            </div>
+            <div class="field field--full">
+              <label class="check" for="checklist-consent">
+                <input id="checklist-consent" name="consent" type="checkbox" value="yes" required />
+                <span>I want the PDF emailed to me and short follow-up emails about this checklist. I can stop anytime by replying “stop.” See <a href="/privacy/">Privacy</a>.</span>
+              </label>
+            </div>
+            <p class="form__err" id="checklist-form-err" role="status"></p>
+            <button type="submit" class="btn">Email me the PDF</button>
+            <p class="form__note">You can also <a href="/checklist/capacitor-revenuecat-stripe-entitlement-checklist.pdf">download the PDF now</a> with no signup.</p>
+          </form>
+          <div id="checklist-thanks" class="thanks" hidden tabindex="-1">
+            <h3>Thanks — here is the PDF</h3>
+            <p>Download it now. This does not depend on email: <a href="/checklist/capacitor-revenuecat-stripe-entitlement-checklist.pdf">Capacitor + RevenueCat + Stripe entitlement checklist (PDF)</a>.</p>
+            <p>The same items stay on this page. We’ll also send the link to <span id="checklist-thanks-email">your email</span>.</p>
+          </div>
+        </section>
 
         <h2>1. App user IDs and aliasing with Supabase Auth</h2>
         <ul class="check-list">
@@ -189,6 +229,7 @@
         <p>If paid access already drifts between web and the Capacitor app, tell us where. If the stack matches, we will email you to confirm scope. This checklist stays free either way.</p>
         <div class="ctas">
           <a class="btn" href="/#contact">Book a fit check</a>
+          <a class="btn btn--ghost" href="/checklist/capacitor-revenuecat-stripe-entitlement-checklist.pdf">Download the PDF</a>
           <a class="btn btn--ghost" href="/#pricing">See pricing</a>
         </div>
       </div>
@@ -200,9 +241,6 @@
     <p class="small muted">RevenueCat, Stripe, Supabase, Apple, App Store, Google Play and Android are trademarks of their respective owners. AppContinuity is an independent service and is not affiliated with them.</p>
   </footer>
   <script type="module" src="/src/article.js"></script>
-  <script type="module">
-    const btn = document.getElementById('print-checklist');
-    if (btn) btn.addEventListener('click', () => window.print());
-  </script>
+  <script type="module" src="/src/checklist-form.js"></script>
 </body>
 </html>

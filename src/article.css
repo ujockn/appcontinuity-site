@@ -165,3 +165,23 @@
   .prose tr { break-inside: avoid; }
   a[href]::after { content: ""; }
 }
+
+.checklist-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin: 22px 0 0;
+}
+.checklist-signup { margin: 28px 0 8px; max-width: 64ch; }
+.checklist-signup .form { margin-top: 0; }
+.checklist-signup .signup-title {
+  font-size: 22px;
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+}
+.checklist-signup .signup-lede { margin: 0; color: var(--muted); }
+.checklist-signup .thanks { margin-top: 0; }
+.checklist-signup .thanks p { margin: 0 0 0.7em; }
+.checklist-signup .thanks p:last-child { margin-bottom: 0; }
+.checklist-signup .thanks a { color: var(--accent); }
