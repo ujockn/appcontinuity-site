@@ -36,7 +36,7 @@
     "headline": "Why a Stripe subscriber hits a paywall in your Capacitor iPhone app",
     "description": "Someone pays on the web, opens the iPhone app, and meets a paywall. How Stripe, RevenueCat, and Supabase Auth get out of sync in a Capacitor app.",
     "datePublished": "2026-11-09",
-    "dateModified": "2026-11-09",
+    "dateModified": "2026-11-25",
     "author": {
       "@type": "Organization",
       "name": "AppContinuity",
@@ -89,6 +89,10 @@
         <p>On the web, paid access usually means “this Supabase user has an active Stripe subscription.” In the Capacitor app, paid access often starts as “RevenueCat says this <code>appUserID</code> has an active entitlement,” and that ID may have been created before anyone signed in.</p>
         <p>RevenueCat will happily create an anonymous app user the first time the SDK is configured without an ID. Purchases made in that anonymous state belong to that anonymous ID. Your Supabase user is a different identifier. Stripe’s customer is a third. Until those three are attached to one RevenueCat customer, each platform is answering the question on its own.</p>
         <p>That is why a perfectly valid Stripe subscription does not unlock an iPhone paywall by itself. The App Store never saw that payment, and RevenueCat has not been told that the signed-in Supabase user is the same person who paid on the web.</p>
+
+        <p class="inline-cta">A printable <a href="/checklist/">Capacitor + RevenueCat + Stripe entitlement checklist</a> covers the cases in this article, as a free PDF.</p>
+
+
 
         <h2>Identify the Supabase user before you trust entitlements</h2>
         <p>RevenueCat’s Capacitor SDK is configured once, early in the app lifecycle, with the public SDK key. If you do not yet have a signed-in user, you configure without an app user ID. After Supabase Auth has a session, you log that user’s ID in. The method names below are from RevenueCat’s identifying-customers guide (<a href="https://www.revenuecat.com/docs/customers/identifying-customers">https://www.revenuecat.com/docs/customers/identifying-customers</a>):</p>

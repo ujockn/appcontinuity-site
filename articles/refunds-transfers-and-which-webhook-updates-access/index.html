@@ -36,7 +36,7 @@
     "headline": "Refunds, transfers, and which webhook actually updates access",
     "description": "Which RevenueCat webhook should update paid access after a refund or transfer, and why you re-fetch the subscriber.",
     "datePublished": "2026-11-10",
-    "dateModified": "2026-11-10",
+    "dateModified": "2026-11-25",
     "author": {
       "@type": "Organization",
       "name": "AppContinuity",
@@ -93,6 +93,10 @@
           <li>A Stripe subscription is canceled in the Customer Portal. RevenueCat still shows an active entitlement until the period ends — or, if the Stripe attach is missing, it never updates at all.</li>
         </ul>
         <p>Each case is a different event (or a non-event). Treating “any webhook → set paid=true” is how access drifts.</p>
+
+        <p class="inline-cta">A printable <a href="/checklist/">Capacitor + RevenueCat + Stripe entitlement checklist</a> covers the cases in this article, as a free PDF.</p>
+
+
 
         <h2>One entitlement, three writers</h2>
         <p>On this stack, three systems can honestly disagree for a few seconds:</p>

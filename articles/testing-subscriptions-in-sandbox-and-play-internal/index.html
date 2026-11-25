@@ -36,7 +36,7 @@
     "headline": "Testing subscriptions end to end in App Store sandbox and Play internal testing",
     "description": "How to test Capacitor + RevenueCat subscriptions on a real iPhone or iPad in App Store sandbox, and on Android in Play internal testing.",
     "datePublished": "2026-11-11",
-    "dateModified": "2026-11-11",
+    "dateModified": "2026-11-25",
     "author": {
       "@type": "Organization",
       "name": "AppContinuity",
@@ -94,6 +94,10 @@
           <li>The Capacitor app can show “entitlement active” from cached <code>CustomerInfo</code> while RevenueCat never received the receipt — or received it under an anonymous App User ID instead of your Supabase <code>user.id</code>.</li>
         </ul>
         <p>Each of those can look like a passing test. None of them is the pre-launch check.</p>
+
+        <p class="inline-cta">A printable <a href="/checklist/">Capacitor + RevenueCat + Stripe entitlement checklist</a> covers the cases in this article, as a free PDF.</p>
+
+
 
         <h2>What this test is</h2>
         <p>Use the platform sandbox, on a physical device, with the platform RevenueCat API keys (Apple and Google), after <code>Purchases.logIn</code> with the Supabase Auth user id. RevenueCat detects sandbox versus production automatically; you do not flip a project setting to “test mode.” You do turn on <strong>View Sandbox Data</strong> in the dashboard, or the transaction will look missing.</p>

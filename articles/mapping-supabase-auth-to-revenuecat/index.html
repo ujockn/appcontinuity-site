@@ -36,7 +36,7 @@
     "headline": "Mapping Supabase Auth user IDs to RevenueCat without granting the wrong person’s access",
     "description": "Wire Supabase Auth user.id to RevenueCat logIn and logOut so account switches do not hand the next person someone else’s premium.",
     "datePublished": "2026-11-09",
-    "dateModified": "2026-11-09",
+    "dateModified": "2026-11-25",
     "author": {
       "@type": "Organization",
       "name": "AppContinuity",
@@ -93,6 +93,10 @@
           <li>Whatever you use to attach Stripe to that same RevenueCat customer</li>
         </ol>
         <p>Until they do, web, store, and app each answer “is this person paid?” alone.</p>
+
+        <p class="inline-cta">A printable <a href="/checklist/">Capacitor + RevenueCat + Stripe entitlement checklist</a> covers the cases in this article, as a free PDF.</p>
+
+
 
         <h2>Configure once, identify after Auth</h2>
         <p>RevenueCat’s Capacitor flow for “I get my user id later” is: configure without a custom id, then <code>logIn</code> when Auth has a session (<a href="https://www.revenuecat.com/docs/customers/identifying-customers">Identifying Customers</a>):</p>

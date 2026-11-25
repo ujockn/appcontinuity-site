@@ -36,7 +36,7 @@
     "headline": "Why Play review says the item you were attempting to purchase could not be found",
     "description": "A RevenueCat paywall that works for license testers can still fail Play review with “item could not be found.” Check regions, offers, and a non-tester buy.",
     "datePublished": "2026-11-22",
-    "dateModified": "2026-11-22",
+    "dateModified": "2026-11-25",
     "author": {
       "@type": "Organization",
       "name": "AppContinuity",
@@ -93,6 +93,10 @@
           <li>An appeal with a screen recording of your own purchase can still be denied. The reviewer was never on the license-tester path you recorded.</li>
         </ul>
         <p>That is usually not a Capacitor click handler. It is a product or offer that Play will not sell to <em>that</em> account in <em>that</em> country, even though the same paywall works for testers in yours.</p>
+
+        <p class="inline-cta">A printable <a href="/checklist/">Capacitor + RevenueCat + Stripe entitlement checklist</a> covers the cases in this article, as a free PDF.</p>
+
+
 
         <h2>What the error actually is</h2>
         <p>The message appears on Google Play’s purchase sheet, not in a RevenueCat dialog. You cannot catch it and replace it with your own copy; the sheet has already appeared. Google’s Play Billing docs describe the matching condition as <code>ITEM_UNAVAILABLE</code>: the product is not available for purchase for this user. They tell you to refresh product details, only sell products that <code>queryProductDetailsAsync</code> returned, and check eligibility and regional configuration. To be available, a product needs to be active, its app needs to be published, and the app needs to be available in the user’s country. They also note a propagation delay, especially during testing: the configuration can be correct and the error can still appear until Play’s servers catch up.</p>
